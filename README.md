@@ -9,3 +9,10 @@ install guide:
 2. Install MongoDB 
     https://www.mongodb.com/dr/fastdl.mongodb.org/win32/mongodb-win32-x86_64-2012plus-4.2.0-signed.msi/download
     
+    create folder: C:\data\db
+    
+    cd to C:\Program Files\MongoDB\Server\\{mongodb_version}\bin>
+    
+    enter command mongod
+        
+    by default, mongodb server will start at port 27017
