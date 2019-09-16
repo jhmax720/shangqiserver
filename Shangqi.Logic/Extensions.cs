@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace ShangqiSocket
+namespace Shangqi.Logic
 {
     public static class Extensions
     {

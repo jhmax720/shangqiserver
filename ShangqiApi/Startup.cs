@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Shangqi.Logic.Configuration;
 
 namespace ShangqiApi
 {
@@ -29,6 +30,8 @@ namespace ShangqiApi
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            services.Configure<DBSettings>(
+                Configuration.GetSection(nameof(DBSettings)));
 
             services.AddStackExchangeRedisCache(options =>
             {

@@ -13,8 +13,10 @@ namespace ShangqiSocketClient
             {
                 Console.WriteLine("starting socket client..");
 
-                int port = 5000;
+                //int port = 5000;
                 string host = "127.0.0.1";//服务器端ip地址
+                int port = 8007;
+                //string host = "localhost";//服务器端ip地址
 
                 IPAddress ip = IPAddress.Parse(host);
                 IPEndPoint ipe = new IPEndPoint(ip, port);
@@ -31,7 +33,8 @@ namespace ShangqiSocketClient
                     if (sendStr == "exit")
                         break;
 
-                    //sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""192.168.0.100:5050"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": 2231.30538, ""latitude"": 11353.76058, ""battery"":90, ""check"": 8}";
+                    //Test
+                    sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""192.168.0.100:5050"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": 2231.30538, ""latitude"": 11353.76058, ""battery"":90, ""check"": 8}";
                     byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
                     clientSocket.Send(sendBytes);
 

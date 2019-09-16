@@ -11,25 +11,19 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Shangqi.Logic;
 using Shangqi.Logic.Model;
 
 namespace ShangqiSocket
 {
 
-    public class MyRedisOptions : IOptions<RedisCacheOptions>
-    {
-       
-        public RedisCacheOptions Value => new RedisCacheOptions
-        {
-            Configuration = "127.0.0.1:6379",
-            InstanceName = "shangqi"
-        };
-    }
+   
     class Program
     {
         private static byte[] result = new byte[1024];
         private const int port = 5000;
-        private static string IpStr = "127.0.0.1";
+        //private static string IpStr = "127.0.0.1";
+        private static string IpStr = "localhost";
         private static TcpListener listener;
         public static List<TcpClient> clients = new List<TcpClient>();
 
@@ -74,7 +68,7 @@ namespace ShangqiSocket
             /*                   */
             /* 用来打印接收的消息*/
             /*                   */
-            IDistributedCache cache = new RedisCache(new MyRedisOptions());
+            
             TcpClient client = reciveClient as TcpClient;
             if (client == null)
             {
@@ -93,16 +87,27 @@ namespace ShangqiSocket
                         //在服务器显示收到的数据
                         Console.WriteLine("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
 
+                        HeartBeatModel model = null;
 
-                        //HeartBeatModel model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+                        try
+                        {
+                            model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+                            //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();
+                            RedisHelper.Instance.SetCache<HeartBeatModel>(str, model).Wait();
+
+                            HeartBeatModel p = RedisHelper.Instance.GetCacheItem<HeartBeatModel>(str).Result;
+
+                            Console.WriteLine($"cached value:{p.tcpip}");
+                        }
+                        catch (Exception e)
+                        {
+                            
+                        }
+                        
 
 
 
-                        cache.SetAsync(str, str, new DistributedCacheEntryOptions()).Wait();
-
-                        string p = cache.GetStringAsync(str).Result;
-
-                        Console.WriteLine($"cached value:{p}");
+                        
 
 
 

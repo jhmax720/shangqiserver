@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShangqiApi", "ShangqiApi\ShangqiApi.csproj", "{F65B6076-A293-4FB5-A667-BEC8A63E1782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShangqiApi", "ShangqiApi\ShangqiApi.csproj", "{F65B6076-A293-4FB5-A667-BEC8A63E1782}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShangqiSocket", "ShangqiSocket\ShangqiSocket.csproj", "{497124BB-22D2-4BB8-A68E-3FE276713089}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShangqiSocket", "ShangqiSocket\ShangqiSocket.csproj", "{497124BB-22D2-4BB8-A68E-3FE276713089}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShangqiSocketClient", "ShangqiSocketClient\ShangqiSocketClient.csproj", "{2D38BE72-D144-4FD4-A417-4B64307B28CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShangqiSocketClient", "ShangqiSocketClient\ShangqiSocketClient.csproj", "{2D38BE72-D144-4FD4-A417-4B64307B28CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shangqi.Logic", "Shangqi.Logic\Shangqi.Logic.csproj", "{D9090D07-EFB1-4E02-9CBE-6ABA7687169E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shangqi.Logic", "Shangqi.Logic\Shangqi.Logic.csproj", "{D9090D07-EFB1-4E02-9CBE-6ABA7687169E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
