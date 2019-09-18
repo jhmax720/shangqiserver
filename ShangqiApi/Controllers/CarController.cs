@@ -46,28 +46,37 @@ namespace ShangqiApi.Controllers
         [HttpPost("/command")]
         public async Task Command()
         {
-            var raw = RedisHelper.Instance.GetNormalItem("client");
+            RedisHelper.Instance.SetNormalCache("command", Encoding.UTF8.GetBytes("fuck you thank you"));
+            //Send redis a message
+            //var model = new HeartBeatModel()
+            //{
+            //    tcpip = "123123",
+            //    type = "max"
+            //};
 
-            
-            using (var stream = new MemoryStream(raw))
-            {
-                {
-                    var mf =  (ConnectionContext)new BinaryFormatter().Deserialize(stream);
-                    string msg = "hello world from max";
 
-                    byte[] bytes = Encoding.ASCII.GetBytes(msg);
+            //var raw = RedisHelper.Instance.SetCache<HeartBeatModel>("command", model);
 
-                    var sor = new ReadOnlyMemory<byte>(bytes);
-                    await mf.Transport.Output.WriteAsync(sor);
-                    foreach (var segment in bytes)
-                    {
-                        
-                    }
-                    
-                }
-            }
 
-            
+            //using (var stream = new MemoryStream(raw))
+            //{
+            //    {
+            //        var mf =  (ConnectionContext)new BinaryFormatter().Deserialize(stream);
+            //        string msg = "hello world from max";
+
+            //        byte[] bytes = Encoding.ASCII.GetBytes(msg);
+
+            //        var sor = new ReadOnlyMemory<byte>(bytes);
+            //        await mf.Transport.Output.WriteAsync(sor);
+            //        foreach (var segment in bytes)
+            //        {
+
+            //        }
+
+            //    }
+            //}
+
+
         }
 
 

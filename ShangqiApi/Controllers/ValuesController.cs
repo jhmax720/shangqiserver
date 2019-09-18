@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Shangqi.Logic;
+using Shangqi.Logic.Model;
 
 namespace ShangqiApi.Controllers
 {
@@ -21,11 +23,40 @@ namespace ShangqiApi.Controllers
             _cache = cache;
         }
 
+        [HttpPost("/command")]
+        public async Task Command()
+        {
+
+            //Send redis a message
+            var model = new HeartBeatModel()
+            {
+                tcpip = "123123",
+                type = "max"
+            };
+
+
+            var raw = RedisHelper.Instance.SetCache<HeartBeatModel>("command", model);
+
+
+
+
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            //var model = new HeartBeatModel()
+            //{
+            //    tcpip = "123123",
+            //    type = "max"
+            //};
+
+
+            RedisHelper.Instance.SetNormalCache("command", Encoding.UTF8.GetBytes("fuck you thank you"));
+
+
+            return new string[] { "value3", "value2" };
         }
 
         // GET api/values/5
@@ -38,7 +69,9 @@ namespace ShangqiApi.Controllers
             {
                 value = System.Text.Encoding.Default.GetString(result);
             }
-                
+
+            var result2 = RedisHelper.Instance.GetNormalItem("command");
+            var result3 =System.Text.Encoding.Default.GetString(result2);
             return value;
         }
 

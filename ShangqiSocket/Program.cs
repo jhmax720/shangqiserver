@@ -20,10 +20,9 @@ namespace ShangqiSocket
    
     class Program
     {
-        private static byte[] result = new byte[1024];
+        //private static byte[] result = new byte[1024];
         private const int port = 5000;
-        //private static string IpStr = "127.0.0.1";
-        private static string IpStr = "localhost";
+        private static string IpStr = "127.0.0.1";
         private static TcpListener listener;
         public static List<TcpClient> clients = new List<TcpClient>();
 
@@ -37,6 +36,44 @@ namespace ShangqiSocket
 
             //异步接收 递归循环接收多个客户端
             listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpclient), listener);
+
+
+            //sending
+
+
+
+
+            while (true)
+            {
+                try
+                {
+                    if (clients.Count > 0)
+                    {
+                        var model = RedisHelper.Instance.GetNormalItem("command");
+                        if (model != null)
+                        {
+                            Console.WriteLine("found a command from redis");
+                            var client = clients[0];
+                            var stream = client.GetStream();
+                            string msg = "static message from max";
+                            byte[] result = new byte[1024];
+                            result = Encoding.UTF8.GetBytes(msg);
+                            Console.WriteLine("static message from max");
+                            stream.Write(result, 0, result.Length);
+                            stream.Flush();
+                            RedisHelper.Instance.ClearKey("command");
+                        }
+
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine("error:" + e.ToString());
+                    break;
+                }
+
+            }
             Console.ReadKey();
         }
 
@@ -49,7 +86,7 @@ namespace ShangqiSocket
 
             TcpClient client = listener.EndAcceptTcpClient(State);
 
-            clients.Add(client);
+            
 
             Console.WriteLine("\n new client connected:{0}", client.Client.RemoteEndPoint.ToString());
             //开启线程用来持续收来自客户端的数据
@@ -61,6 +98,8 @@ namespace ShangqiSocket
              myThread.Start(client);
             //Task.Run(async () => await printReceiveMsg(client));
             listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpclient), listener);
+
+            clients.Add(client);
         }
 
         private static void printReceiveMsg(object reciveClient)
@@ -75,38 +114,38 @@ namespace ShangqiSocket
                 Console.WriteLine("client error");
                 return;
             }
-            while (true)
+
+            try
             {
-                try
+                NetworkStream stream = client.GetStream();
+                while (true)
                 {
-                    NetworkStream stream = client.GetStream();
+                    byte[] result = new byte[1024];
                     int num = stream.Read(result, 0, result.Length); //将数据读到result中，并返回字符长度                  
                     if (num != 0)
                     {
                         string str = Encoding.UTF8.GetString(result, 0, num);//把字节数组中流存储的数据以字符串方式赋值给str
-                        //在服务器显示收到的数据
+                                                                             
                         Console.WriteLine("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
 
                         HeartBeatModel model = null;
 
-                        try
-                        {
-                            model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
-                            //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();
-                            RedisHelper.Instance.SetCache<HeartBeatModel>(str, model).Wait();
+                        //model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+                        //if(model!=null)
+                        //{
+                        //    RedisHelper.Instance.SetNormalCache("command", Encoding.UTF8.GetBytes("WTF!"));
+                        //}
+                        //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();
+                        //RedisHelper.Instance.SetCache<HeartBeatModel>(str, model).Wait();
 
-                            HeartBeatModel p = RedisHelper.Instance.GetCacheItem<HeartBeatModel>(str).Result;
+                        //HeartBeatModel p = RedisHelper.Instance.GetCacheItem<HeartBeatModel>(str).Result;
+                        //var result2 = RedisHelper.Instance.GetNormalItem("command");
+                        //if(result2!=null)
+                        //{
+                        //    var p = System.Text.Encoding.Default.GetString(result2);
 
-                            Console.WriteLine($"cached value:{p.tcpip}");
-                        }
-                        catch (Exception e)
-                        {
-                            
-                        }
-                        
-
-
-
+                        //    Console.WriteLine($"cached value:{p}");
+                        //}
                         
 
 
@@ -114,24 +153,29 @@ namespace ShangqiSocket
                         //服务器收到消息后并会给客户端一个消息。
                         string msg = str;
                         result = Encoding.UTF8.GetBytes(msg);
-                        stream = client.GetStream();
+                        //stream = client.GetStream();
                         stream.Write(result, 0, result.Length);
                         stream.Flush();
                     }
                     else
                     {   //这里需要注意 当num=0时表明客户端已经断开连接，需要结束循环，不然会死循环一直卡住
                         Console.WriteLine("client closed");
+                        stream.Dispose();
                         break;
                     }
-                }
-                catch (Exception e)
-                {
-                    clients.Remove(client);
-                    Console.WriteLine("error:" + e.ToString());
-                    break;
+
                 }
 
+                stream.Dispose();
             }
+            catch (Exception e)
+            {
+                clients.Remove(client);
+                Console.WriteLine("error:" + e.ToString());
+                
+                
+            }
+          
 
         }
 

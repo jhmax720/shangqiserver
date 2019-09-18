@@ -24,16 +24,24 @@ namespace Shangqi.Logic
             where T : class, new()
         {
             var data = await cache.GetAsync(key);
-            using (var stream = new MemoryStream(data))
+            if (data != null)
             {
+                using (var stream = new MemoryStream(data))
                 {
-                    return (T)new BinaryFormatter().Deserialize(stream);
+                    {
+                        return (T)new BinaryFormatter().Deserialize(stream);
+                    }
                 }
             }
+            else
+            {
+                return null;
+            }
+            
         }
 
 
-        public static async Task SetAsync(this IDistributedCache cache, string key, string value, DistributedCacheEntryOptions options)
+        public static async Task SetAsyncString(this IDistributedCache cache, string key, string value, DistributedCacheEntryOptions options)
         {
             await cache.SetAsync(key, Encoding.UTF8.GetBytes(value), options);
         }

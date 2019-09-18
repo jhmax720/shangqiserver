@@ -56,6 +56,11 @@ namespace Shangqi.Logic
         {
            return await _cache.GetAsync<T>(key);
         }
+        public void ClearKey(string key)
+        {
+            _cache.Remove(key);
+            
+        }
         //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();
 
         //HeartBeatModel p = cache.GetAsync<HeartBeatModel>(str).Result;
