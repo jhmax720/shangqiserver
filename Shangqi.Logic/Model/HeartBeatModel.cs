@@ -16,5 +16,8 @@ namespace Shangqi.Logic.Model
 
         [JsonProperty(PropertyName = "tcp/ip")]
         public string tcpip { get; set; }
+
+        [JsonProperty(PropertyName = "robot_status")]
+        public string Status { get; set; }
     }
 }

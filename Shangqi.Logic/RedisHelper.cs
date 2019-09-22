@@ -38,9 +38,21 @@ namespace Shangqi.Logic
             await _cache.SetAsync<T>(key, model, new DistributedCacheEntryOptions());
         }
 
-        public async Task<bool>TryGetCarList(string key, RegisteredCarModel model)
+        //true => added
+        //false => not added
+        public object TryGetFromCarList(string key, RegisteredCarModel model)
         {
-            return true;
+            throw new NotImplementedException();
+        }
+
+        public bool TryAddToCarList(string key, RegisteredCarModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object TryGetLatestCarRecord(string key)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetNormalCache(string key, byte[] value)

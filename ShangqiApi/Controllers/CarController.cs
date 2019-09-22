@@ -25,7 +25,7 @@ namespace ShangqiApi.Controllers
             _service = service;
         }
         // GET api/car/list
-        [HttpGet("/list")]
+        [HttpGet("list")]
         public List<RegisteredCarModel> Get()
         {
             var l = _service.List();
@@ -43,7 +43,7 @@ namespace ShangqiApi.Controllers
             return results.ToList();
         }
 
-        [HttpPost("/command")]
+        [HttpPost("command")]
         public async Task Command()
         {
             RedisHelper.Instance.SetNormalCache("command", Encoding.UTF8.GetBytes("fuck you thank you"));
@@ -78,6 +78,37 @@ namespace ShangqiApi.Controllers
 
 
         }
+
+        //STEP 1 CREATE A CAR RECORD 
+        public async Task CreateCarRecord(string carId, string recordId)
+        {
+
+            if (recordId == null)
+            {
+
+            }
+            else
+            {
+                
+            }
+            //add to db
+            _service.AddNewCarRecord();
+            
+            //update cache
+            await RedisHelper.Instance.SetCache<RecordingModel>("carId", new RecordingModel());
+
+            //send to client
+            await RedisHelper.Instance.SetCache<OutboundModel>("command", new OutboundModel());
+
+        }
+
+
+        public async Task EndCarRecord(string recordId)
+        {
+
+        }
+
+
 
 
 

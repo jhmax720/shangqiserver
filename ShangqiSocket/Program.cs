@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shangqi.Logic;
 using Shangqi.Logic.Model;
+using Shangqi.Logic.Services;
 
 namespace ShangqiSocket
 {
@@ -26,8 +27,12 @@ namespace ShangqiSocket
         private static TcpListener listener;
         public static List<TcpClient> clients = new List<TcpClient>();
 
+        private static CarDbService _carDbService;
+
         static void Main(string[] args)
         {
+            _carDbService = new CarDbService("", "", "");
+
             IPAddress ip = IPAddress.Parse(IpStr);
             IPEndPoint ip_end_point = new IPEndPoint(IPAddress.Any, port);
             listener = new TcpListener(ip_end_point);
@@ -49,15 +54,16 @@ namespace ShangqiSocket
                 {
                     if (clients.Count > 0)
                     {
-                        var model = RedisHelper.Instance.GetNormalItem("command");
+                        var model = RedisHelper.Instance.GetCacheItem<OutboundModel>("command").Result;
                         if (model != null)
                         {
                             Console.WriteLine("found a command from redis");
                             var client = clients[0];
                             var stream = client.GetStream();
-                            string msg = "static message from max";
-                            byte[] result = new byte[1024];
-                            result = Encoding.UTF8.GetBytes(msg);
+                            //string msg = "static message from max";
+                            //byte[] result = new byte[1024];
+                            //var result = Encoding.UTF8.GetBytes(msg);
+                            var result = ObjectToByteArray(model.Data);
                             Console.WriteLine("static message from max");
                             stream.Write(result, 0, result.Length);
                             stream.Flush();
@@ -130,11 +136,44 @@ namespace ShangqiSocket
 
                         HeartBeatModel model = null;
 
-                        //model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
-                        //if(model!=null)
-                        //{
-                        //    RedisHelper.Instance.SetNormalCache("command", Encoding.UTF8.GetBytes("WTF!"));
-                        //}
+                        model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+                        if (model != null)
+                        {
+                            //Check if in cache
+                            //get cache car list
+                            var carInCache = RedisHelper.Instance.TryGetFromCarList("car", null);
+                            if (carInCache == null)
+                            {
+                                //add to the db
+                                _carDbService.AddCar();
+                                //add to the cache
+                                carInCache = RedisHelper.Instance.TryAddToCarList("car", null);
+
+                                
+                            }
+
+                            //verify the car status in cache
+                            if (model.Status == carInCache)//.status)
+                            {
+                                if (model.Status == "recording")
+                                {
+                                    //add the coordinate to the cache
+
+                                    var latestCachedCarRecord = RedisHelper.Instance.TryGetLatestCarRecord(model.tcpip);
+                                    if (latestCachedCarRecord != null)
+                                    {
+                                        new RecordingModel().Coordinates.Add(new CoordinateModel()); //add lad, add longtitude
+                                    }
+
+
+
+                                }
+
+
+                            }
+                            
+
+                        }
                         //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();
                         //RedisHelper.Instance.SetCache<HeartBeatModel>(str, model).Wait();
 
@@ -146,10 +185,11 @@ namespace ShangqiSocket
 
                         //    Console.WriteLine($"cached value:{p}");
                         //}
-                        
 
 
 
+
+                        //TODO REMOVE
                         //服务器收到消息后并会给客户端一个消息。
                         string msg = str;
                         result = Encoding.UTF8.GetBytes(msg);
@@ -179,5 +219,16 @@ namespace ShangqiSocket
 
         }
 
+        private static byte[] ObjectToByteArray(object obj)
+        {
+            if (obj == null)
+                return null;
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
     }
 }

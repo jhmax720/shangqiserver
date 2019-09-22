@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shangqi.Logic.Configuration;
+using Shangqi.Logic.Services;
 
 namespace ShangqiApi
 {
@@ -38,6 +40,9 @@ namespace ShangqiApi
                 options.Configuration = "localhost";
                 options.InstanceName = "shangqi";
             });
+
+
+            services.AddSingleton<CarDbService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

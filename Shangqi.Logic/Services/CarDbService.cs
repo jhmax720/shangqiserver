@@ -11,15 +11,26 @@ namespace Shangqi.Logic.Services
     {
         //Private Constructor.
 
-        private readonly IMongoCollection<RegisteredCarData> _cars;
+        private IMongoCollection<RegisteredCarData> _cars;
+
 
         public CarDbService(DBSettings settings)
         {
-            var client = new MongoClient(settings.ConnectionString);
-            var _db = client.GetDatabase(settings.DatabaseName);
-            _cars = _db.GetCollection<RegisteredCarData>(settings.CarCollectionName);
-
+            Setup(settings.ConnectionString, settings.DatabaseName, settings.CarCollectionName);
         }
+
+        private void Setup(string cs, string db, string car)
+        {
+            var client = new MongoClient(cs);
+            var _db = client.GetDatabase(db);
+            _cars = _db.GetCollection<RegisteredCarData>(car);
+        }
+
+        public CarDbService(string cs, string db, string car)
+        {
+            Setup(cs, db, car);
+        }
+
 
         public IList<RegisteredCarData> List()
         {
@@ -28,6 +39,14 @@ namespace Shangqi.Logic.Services
             return list;
         }
 
+        public void AddCar()
+        {
 
+        }
+
+        public void AddNewCarRecord()
+        {
+
+        }
     }
 }
