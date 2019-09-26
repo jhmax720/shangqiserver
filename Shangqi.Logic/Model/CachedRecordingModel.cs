@@ -14,8 +14,12 @@ namespace Shangqi.Logic.Model
         public int CarStatus { get; set; }
 
         public CoordinateModel TriggerPoint { get; set; }
+
+        public CoordinateModel EndPoint { get; set; }
         public CoordinateModel CurrentPosition { get; set; }
         public IList<CoordinateModel> CachedCoordinates { get; set; }
+
+        public bool IsMainVehicle { get; set; }
 
         public CachedRecordingModel()
         {

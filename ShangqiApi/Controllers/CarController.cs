@@ -105,6 +105,8 @@ namespace ShangqiApi.Controllers
 
             //send to client to end recording
             await RedisHelper.Instance.SetCache<OutboundModel>("command", new OutboundModel());
+
+            //update cache status = 0;
         }
 
 
@@ -122,7 +124,8 @@ namespace ShangqiApi.Controllers
             //create a new route in db
             _service.AddRoute(selected_Coordinates);
 
-            //
+            //update the end position in cache
+
             
         }
 

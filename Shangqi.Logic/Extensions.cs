@@ -5,6 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using Shangqi.Logic.Model;
 
 namespace Shangqi.Logic
 {
@@ -55,6 +56,17 @@ namespace Shangqi.Logic
                 return Encoding.UTF8.GetString(data);
             }
             return null;
+        }
+
+        public static bool IsInRange(this CoordinateModel model, string longitude, string latitude)
+        {
+
+            //var sCoord = new GeoCoordinate(longitude, latitude);
+            //var eCoord = new GeoCoordinate(model.Longitude, model.Latitude);
+
+            //return sCoord.GetDistanceTo(eCoord);
+            return false;
+
         }
     }
 }

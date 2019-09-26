@@ -64,6 +64,9 @@ namespace ShangqiSocket
                             //byte[] result = new byte[1024];
                             //var result = Encoding.UTF8.GetBytes(msg);
                             var result = ObjectToByteArray(model.Data);
+
+                            //TODO RESET CACHED COORDINATES
+
                             Console.WriteLine("static message from max");
                             stream.Write(result, 0, result.Length);
                             stream.Flush();
@@ -139,6 +142,7 @@ namespace ShangqiSocket
                         _heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(str);
                         if (_heartBeat != null)
                         {
+
                             //Check if in cache
                             //get cache car list
                             var carInCache = RedisHelper.Instance.TryGetFromCarList("car_{ip}");
@@ -152,17 +156,38 @@ namespace ShangqiSocket
                                 
                             }
 
+
                             //verify the car status in cache consitent with client
                             if (_heartBeat.Status == carInCache.CarStatus)
                             {
-                                if (_heartBeat.Status == 1)//recording
+                                //recording
+                                //// 1 == REMOTE CONTROL MODE
+                                if (_heartBeat.Status == 1)
                                 {
                                     //add the coordinate to the cache
                                     carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
                                 }
-
-
+                                //2 == AUTO PILOT MODE
+                                else if(_heartBeat.Status == 2)
+                                {
+                                    //add the coordinates to the cache
+                                    carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
+                                    //update current position in cache
+                                    carInCache.TriggerPoint = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
+                                    //are 
+                                }
                             }
+
+                            if (carInCache.IsMainVehicle)
+                            {
+                                //update the current position of the main car to cache
+                            }
+                            else
+                            {
+                                
+                            }
+
+                            
 
 
                             
