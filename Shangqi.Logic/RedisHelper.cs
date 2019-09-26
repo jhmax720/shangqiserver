@@ -13,7 +13,7 @@ namespace Shangqi.Logic
     {
         private IDistributedCache _cache;
 
-        private IDictionary<string, IList<RegisteredCarModel>> _carCollection; 
+        private IDictionary<string, IList<CachedRecordingModel>> _carCollection; 
 
         private RedisHelper()
         {
@@ -40,20 +40,16 @@ namespace Shangqi.Logic
 
         //true => added
         //false => not added
-        public object TryGetFromCarList(string key, RegisteredCarModel model)
+        public CachedRecordingModel TryGetFromCarList(string key)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryAddToCarList(string key, RegisteredCarModel model)
+        public CachedRecordingModel TryAddToCarList(string key, CachedRecordingModel model)
         {
             throw new NotImplementedException();
         }
 
-        public object TryGetLatestCarRecord(string key)
-        {
-            throw new NotImplementedException();
-        }
 
         public void SetNormalCache(string key, byte[] value)
         {

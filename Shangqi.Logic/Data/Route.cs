@@ -14,16 +14,16 @@ namespace Shangqi.Logic.Data
 
         public string CarId { get; set; }
 
-        public CarTrack ImportedCarTrack { get; set; }
-        public CarTrack CarTrack { get; set; }
-        public CarTrack ImportedCarTrackReturn { get; set; }
-        public CarTrack CarTrackReturn { get; set; }
+        public Coordinate[] ImportedCarTrack { get; set; }
+        public Coordinate[] CarTrack { get; set; }
+        public Coordinate[] ImportedCarTrackReturn { get; set; }
+        public Coordinate[] CarTrackReturn { get; set; }
 
 
         [BsonElement("longitude")]
-        public string Longitude { get; set; }
+        public string TriggerLongitude { get; set; }
 
         [BsonElement("latitude")]
-        public string Latitude { get; set; }
+        public string TriggerLatitude { get; set; }
     }
 }

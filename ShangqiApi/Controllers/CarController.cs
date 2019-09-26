@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Microsoft.AspNetCore.Connections;
 using Shangqi.Logic;
+using Shangqi.Logic.Data;
 
 namespace ShangqiApi.Controllers
 {
@@ -26,21 +27,13 @@ namespace ShangqiApi.Controllers
         }
         // GET api/car/list
         [HttpGet("list")]
-        public List<RegisteredCarModel> Get()
+        public List<CachedRecordingModel> Get()
         {
             var l = _service.List();
-            var results = l.Select(x =>
-            {
-                var model = new RegisteredCarModel()
-                {
-                    status = x.Status,
-                    Id = x.Id
-                };
-                return model;
-            });
+          
             
 
-            return results.ToList();
+            return null;
         }
 
         [HttpPost("command")]
@@ -79,37 +72,70 @@ namespace ShangqiApi.Controllers
 
         }
 
-        //STEP 1 CREATE A CAR RECORD 
-        public async Task CreateCarRecord(string carId, string recordId)
+        //STEP 1 START RECORDING CAR COORDINATES
+        public async Task StartCoordinateRecording(string carId, string recordId)
         {
 
             if (recordId == null)
             {
+                //add to db
+                 _service.AddNewCarRecord();
 
+                //setup cache layer
+                await RedisHelper.Instance.SetCache<CachedRecordingModel>("recording_{carId}", new CachedRecordingModel());
+
+                //send to client to start recording
+                await RedisHelper.Instance.SetCache<OutboundModel>("command", new OutboundModel());
             }
             else
             {
                 
             }
-            //add to db
-            _service.AddNewCarRecord();
             
-            //update cache
-            await RedisHelper.Instance.SetCache<RecordingModel>("carId", new RecordingModel());
-
-            //send to client
-            await RedisHelper.Instance.SetCache<OutboundModel>("command", new OutboundModel());
 
         }
 
+        //STEP 2 END RECORDING AND SAVE DATA FROM CACHE
+        public async Task EndCarRecord(string recordId, string carId)
+        {
+            //save cached coordinates to database
+            var inCached = RedisHelper.Instance.TryGetFromCarList(carId);
 
-        public async Task EndCarRecord(string recordId)
+            _service.EndCarRecord(recordId);
+
+            //send to client to end recording
+            await RedisHelper.Instance.SetCache<OutboundModel>("command", new OutboundModel());
+        }
+
+
+        //STEP 3 EXPORT THE COORDINATES IN CSV
+        public async void ExportCoordinateRecord(string recording)
         {
 
         }
+        //STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
+        public void ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
+        {
+            //get the coordinates from uploaded CSV
+            var selected_Coordinates = new Coordinate[] { };
 
+            //create a new route in db
+            _service.AddRoute(selected_Coordinates);
 
+            //
+            
+        }
 
+        //STEP 5 ADD TRIGGER POINT FOR THE ROUTE
+        public async Task AddTriggerCoordinateForRoute(string routeId, string longitude, string latitude)
+        {
+            //update the route in db
+            _service.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
+            //update the route in cache
+            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
+            cached.TriggerPoint = new CoordinateModel(longitude, latitude);
+
+        }
 
 
     }

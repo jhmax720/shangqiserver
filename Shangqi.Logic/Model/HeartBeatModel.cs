@@ -18,6 +18,9 @@ namespace Shangqi.Logic.Model
         public string tcpip { get; set; }
 
         [JsonProperty(PropertyName = "robot_status")]
-        public string Status { get; set; }
+        public int Status { get; set; }
+
+        public string longitude { get; set; }
+        public string latitude { get; set; }
     }
 }

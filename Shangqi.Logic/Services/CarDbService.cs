@@ -12,6 +12,7 @@ namespace Shangqi.Logic.Services
         //Private Constructor.
 
         private IMongoCollection<RegisteredCarData> _cars;
+        private IMongoCollection<CoordinateRecord> _coordinateRecordsCollection;
 
 
         public CarDbService(DBSettings settings)
@@ -45,6 +46,25 @@ namespace Shangqi.Logic.Services
         }
 
         public void AddNewCarRecord()
+        {
+            var record = new CoordinateRecord();
+            //add this to db
+            _coordinateRecordsCollection.InsertOne(record);
+        }
+
+        public void EndCarRecord(string recordId)
+        {
+
+        }
+
+        public void AddRoute(Coordinate[] importedCoordinates )
+        {
+            var route = new Route();
+            route.ImportedCarTrack = importedCoordinates;
+            //todo call db.save()
+        }
+
+        public void UpdateRouteWithTriggerPoint(string recordId, string longtitude, string latitude)
         {
 
         }

@@ -134,43 +134,37 @@ namespace ShangqiSocket
                                                                              
                         Console.WriteLine("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
 
-                        HeartBeatModel model = null;
+                        HeartBeatModel _heartBeat = null;
 
-                        model = JsonConvert.DeserializeObject<HeartBeatModel>(str);
-                        if (model != null)
+                        _heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+                        if (_heartBeat != null)
                         {
                             //Check if in cache
                             //get cache car list
-                            var carInCache = RedisHelper.Instance.TryGetFromCarList("car", null);
+                            var carInCache = RedisHelper.Instance.TryGetFromCarList("car_{ip}");
                             if (carInCache == null)
                             {
-                                //add to the db
+                                //add the car to the db
                                 _carDbService.AddCar();
                                 //add to the cache
-                                carInCache = RedisHelper.Instance.TryAddToCarList("car", null);
+                                carInCache = RedisHelper.Instance.TryAddToCarList("car_{ip}", new CachedRecordingModel());
 
                                 
                             }
 
-                            //verify the car status in cache
-                            if (model.Status == carInCache)//.status)
+                            //verify the car status in cache consitent with client
+                            if (_heartBeat.Status == carInCache.CarStatus)
                             {
-                                if (model.Status == "recording")
+                                if (_heartBeat.Status == 1)//recording
                                 {
                                     //add the coordinate to the cache
-
-                                    var latestCachedCarRecord = RedisHelper.Instance.TryGetLatestCarRecord(model.tcpip);
-                                    if (latestCachedCarRecord != null)
-                                    {
-                                        new RecordingModel().Coordinates.Add(new CoordinateModel()); //add lad, add longtitude
-                                    }
-
-
-
+                                    carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
                                 }
 
 
                             }
+
+
                             
 
                         }
