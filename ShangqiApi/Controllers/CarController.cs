@@ -116,7 +116,7 @@ namespace ShangqiApi.Controllers
 
         }
         //STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
-        public void ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
+        public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
         {
             //get the coordinates from uploaded CSV
             var selected_Coordinates = new Coordinate[] { };
@@ -125,8 +125,9 @@ namespace ShangqiApi.Controllers
             _service.AddRoute(selected_Coordinates);
 
             //update the end position in cache
+            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
+            cached.EndPoint = new CoordinateModel("","");
 
-            
         }
 
         //STEP 5 ADD TRIGGER POINT FOR THE ROUTE

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Shangqi.Logic.Model;
 
+
 namespace Shangqi.Logic
 {
     public static class Extensions
@@ -58,14 +59,47 @@ namespace Shangqi.Logic
             return null;
         }
 
+
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        //:::                                                                         :::
+        //:::  This routine calculates the distance between two points (given the     :::
+        //:::  latitude/longitude of those points). It is being used to calculate     :::
+        //:::  the distance between two locations using GeoDataSource(TM) products    :::
+        //:::                                                                         :::
+        //:::  Definitions:                                                           :::
+        //:::    South latitudes are negative, east longitudes are positive           :::
+        //:::                                                                         :::
+        //:::  Passed to function:                                                    :::
+        //:::    lat1, lon1 = Latitude and Longitude of point 1 (in decimal degrees)  :::
+        //:::    lat2, lon2 = Latitude and Longitude of point 2 (in decimal degrees)  :::
+        //:::    unit = the unit you desire for results                               :::
+        //:::           where: 'M' is statute miles (default)                         :::
+        //:::                  'K' is kilometers                                      :::
+        //:::                  'N' is nautical miles                                  :::
+        //:::                                                                         :::
+        //:::  Worldwide cities and other features databases with latitude longitude  :::
+        //:::  are available at https://www.geodatasource.com                         :::
+        //:::                                                                         :::
+        //:::  For enquiries, please contact sales@geodatasource.com                  :::
+        //:::                                                                         :::
+        //:::  Official Web site: https://www.geodatasource.com                       :::
+        //:::                                                                         :::
+        //:::           GeoDataSource.com (C) All Rights Reserved 2018                :::
+        //:::                                                                         :::
+        //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         public static bool IsInRange(this CoordinateModel model, string longitude, string latitude)
         {
+            var long1 = Convert.ToDouble(model.Longitude);
+            var lat1 = Convert.ToDouble(model.Latitude);
 
-            //var sCoord = new GeoCoordinate(longitude, latitude);
-            //var eCoord = new GeoCoordinate(model.Longitude, model.Latitude);
+            var long2 = Convert.ToDouble(longitude);
+            var lat2 = Convert.ToDouble(latitude);
 
-            //return sCoord.GetDistanceTo(eCoord);
-            return false;
+            var dist = GeoHelper.Distance(lat1, long1, lat2, long2, 'K');
+
+            //todo make this into config
+            //5 meters range
+            return dist < 0.005;
 
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -157,40 +158,62 @@ namespace ShangqiSocket
                             }
 
 
-                            //verify the car status in cache consitent with client
-                            if (_heartBeat.Status == carInCache.CarStatus)
+                            if(carInCache.IsMainVehicle)
                             {
-                                //recording
-                                //// 1 == REMOTE CONTROL MODE
-                                if (_heartBeat.Status == 1)
-                                {
-                                    //add the coordinate to the cache
-                                    carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
-                                }
-                                //2 == AUTO PILOT MODE
-                                else if(_heartBeat.Status == 2)
-                                {
-                                    //add the coordinates to the cache
-                                    carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
-                                    //update current position in cache
-                                    carInCache.TriggerPoint = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
-                                    //are 
-                                }
-                            }
+                                //get main car model
+                                //update current postion
+                                //add to the coordinate list
+                                //trigger other route if possible
 
-                            if (carInCache.IsMainVehicle)
-                            {
-                                //update the current position of the main car to cache
                             }
                             else
-                            {
-                                
+                            {   //verify the car status in cache consitent with client
+                                if (_heartBeat.Status == carInCache.CarStatus)
+                                {
+                                    //recording
+                                    //// 1 == REMOTE CONTROL MODE
+                                    if (_heartBeat.Status == 1)
+                                    {
+                                        //add the coordinate to the cache
+                                        carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
+                                    }
+                                    //2 == AUTO PILOT MODE
+                                    else if (_heartBeat.Status == 2)
+                                    {
+                                        //add the coordinates to the cache
+                                        carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
+                                        //update current position in cache
+                                        carInCache.TriggerPoint = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
+
+                                        //is the current position within the endpoint?
+                                        if (carInCache.EndPoint.IsInRange(_heartBeat.longitude, _heartBeat.latitude))
+                                        {
+                                            //send to client to stop auto pilot mode
+                                            var outbound = new OutboundModel();
+                                            RedisHelper.Instance.SetCache("command", outbound).Wait();
+                                            //update database with the cached coordinates 
+                                            _carDbService.UpdateRouteWithCoordinates(null, carInCache.IsReturn);
+                                            //update cache status to idle
+                                            carInCache.RouteStatus++;
+                                            //end of the process
+                                            if (carInCache.RouteStatus == 4)
+                                            {
+                                                RedisHelper.Instance.ClearKey("car_{ip}");
+                                            }
+                                        }
+                                    }
+                                }
+
+
                             }
 
-                            
 
 
-                            
+
+
+
+
+
 
                         }
                         //cache.SetAsync<HeartBeatModel>(str, model, new DistributedCacheEntryOptions()).Wait();

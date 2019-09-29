@@ -10,7 +10,7 @@ namespace Shangqi.Logic.Model
         public string CarId { get; set; }
         public bool IsReturn { get; set; }
 
-
+        public int RouteStatus { get; set; }
         public int CarStatus { get; set; }
 
         public CoordinateModel TriggerPoint { get; set; }

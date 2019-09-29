@@ -64,6 +64,11 @@ namespace Shangqi.Logic.Services
             //todo call db.save()
         }
 
+        public void UpdateRouteWithCoordinates(Coordinate[] coordinates, bool isReturn = false)
+        {
+
+        }
+
         public void UpdateRouteWithTriggerPoint(string recordId, string longtitude, string latitude)
         {
 
