@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Shangqi.Logic.Model;
 
 namespace Shangqi.Logic.Data
 {
@@ -14,11 +15,11 @@ namespace Shangqi.Logic.Data
 
         public string CarId { get; set; }
 
-        public Coordinate[] ImportedCarTrack { get; set; }
-        public Coordinate[] CarTrack { get; set; }
-        public Coordinate[] ImportedCarTrackReturn { get; set; }
-        public Coordinate[] CarTrackReturn { get; set; }
-
+        public CoordinateModel[] ImportedCarTrack { get; set; }
+        public CoordinateModel[] CarTrack { get; set; }
+        public CoordinateModel[] ImportedCarTrackReturn { get; set; }
+        public CoordinateModel[] CarTrackReturn { get; set; }
+        public int RouteStatus { get; set; }
 
         [BsonElement("longitude")]
         public string TriggerLongitude { get; set; }

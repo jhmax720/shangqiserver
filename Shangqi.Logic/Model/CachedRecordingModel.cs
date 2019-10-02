@@ -18,7 +18,7 @@ namespace Shangqi.Logic.Model
         public CoordinateModel EndPoint { get; set; }
         public CoordinateModel CurrentPosition { get; set; }
         public IList<CoordinateModel> CachedCoordinates { get; set; }
-
+        public IList<CoordinateModel> ImpotedCoordinates { get; set; }
         public bool IsMainVehicle { get; set; }
 
         public CachedRecordingModel()

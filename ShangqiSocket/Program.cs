@@ -27,6 +27,7 @@ namespace ShangqiSocket
         private static string IpStr = "127.0.0.1";
         private static TcpListener listener;
         public static List<TcpClient> clients = new List<TcpClient>();
+        public static List<CachedRecordingModel> _cars = new List<CachedRecordingModel>();
 
         private static CarDbService _carDbService;
 
@@ -152,8 +153,10 @@ namespace ShangqiSocket
                                 //add the car to the db
                                 _carDbService.AddCar();
                                 //add to the cache
+                                
                                 carInCache = RedisHelper.Instance.TryAddToCarList("car_{ip}", new CachedRecordingModel());
 
+                                _cars.Add(carInCache);
                                 
                             }
 
@@ -161,9 +164,30 @@ namespace ShangqiSocket
                             if(carInCache.IsMainVehicle)
                             {
                                 //get main car model
+
                                 //update current postion
+                                carInCache.CurrentPosition = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
                                 //add to the coordinate list
+                                carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
                                 //trigger other route if possible
+                                foreach (var car in _cars)
+                                {
+                                    if(car.RouteStatus<2)
+                                    {
+                                        if (carInCache.TriggerPoint.IsInRange(_heartBeat.longitude,
+                                            _heartBeat.latitude))
+                                        {
+                                            //trigger the route now
+                                            //go to auto pilot mode and send the coordinates to client
+                                            var outbound = new OutboundModel();
+                                            RedisHelper.Instance.SetCache("command", outbound).Wait();
+                                            //update database with the cached coordinates 
+                                            _carDbService.UpdateRouteWithStatus(2);
+                                            //update cache status to action
+                                            carInCache.RouteStatus =2 ;
+                                        }
+                                    }
+                                }
 
                             }
                             else
@@ -183,7 +207,7 @@ namespace ShangqiSocket
                                         //add the coordinates to the cache
                                         carInCache.CachedCoordinates.Add(new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude));
                                         //update current position in cache
-                                        carInCache.TriggerPoint = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
+                                        carInCache.CurrentPosition = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
 
                                         //is the current position within the endpoint?
                                         if (carInCache.EndPoint.IsInRange(_heartBeat.longitude, _heartBeat.latitude))
@@ -199,6 +223,7 @@ namespace ShangqiSocket
                                             if (carInCache.RouteStatus == 4)
                                             {
                                                 RedisHelper.Instance.ClearKey("car_{ip}");
+                                                
                                             }
                                         }
                                     }

@@ -4,6 +4,7 @@ using System.Text;
 using MongoDB.Driver;
 using Shangqi.Logic.Configuration;
 using Shangqi.Logic.Data;
+using Shangqi.Logic.Model;
 
 namespace Shangqi.Logic.Services
 {
@@ -57,18 +58,23 @@ namespace Shangqi.Logic.Services
 
         }
 
-        public void AddRoute(Coordinate[] importedCoordinates )
+        public void AddRoute(CoordinateModel[] importedCoordinates )
         {
             var route = new Route();
             route.ImportedCarTrack = importedCoordinates;
             //todo call db.save()
         }
 
-        public void UpdateRouteWithCoordinates(Coordinate[] coordinates, bool isReturn = false)
+        public void UpdateRouteWithCoordinates(CoordinateModel[] coordinates, bool isReturn = false)
         {
 
         }
 
+
+        public void UpdateRouteWithStatus(int status)
+        {
+
+        }
         public void UpdateRouteWithTriggerPoint(string recordId, string longtitude, string latitude)
         {
 

@@ -98,8 +98,8 @@ namespace Shangqi.Logic
             var dist = GeoHelper.Distance(lat1, long1, lat2, long2, 'K');
 
             //todo make this into config
-            //5 meters range
-            return dist < 0.005;
+            //3 meters range
+            return dist < 0.003;
 
         }
     }
