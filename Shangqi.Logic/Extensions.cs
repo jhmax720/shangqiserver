@@ -12,6 +12,18 @@ namespace Shangqi.Logic
 {
     public static class Extensions
     {
+
+        public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source)
+        {
+            var coo = new CoordinateModel(source.longitude, source.latitude);
+            var cachedCachedRecordingModel = new CachedRecordingModel {
+                CarIp = source.tcpip,
+                CurrentPosition = coo                
+
+            };
+            return cachedCachedRecordingModel;
+        }
+
         public static async Task SetAsync<T>(this IDistributedCache cache, string key, T value, DistributedCacheEntryOptions options)
             where T : class, new()
         {

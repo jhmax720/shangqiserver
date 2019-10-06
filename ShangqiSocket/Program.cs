@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shangqi.Logic;
 using Shangqi.Logic.Model;
+using Shangqi.Logic.Model.Outbound;
 using Shangqi.Logic.Services;
 
 namespace ShangqiSocket
@@ -167,32 +168,30 @@ namespace ShangqiSocket
                                                                              
                         Console.WriteLine("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
 
-                        HeartBeatModel _heartBeat = null;
 
-                        _heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(str);
+
+                        HeartBeatModel _heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(str);
                         if (_heartBeat != null)
                         {
 
-                            //Check if in cache
+                            //Check if the car is in cache
                             //get cache car list
-                            var carInCache = RedisHelper.Instance.TryGetFromCarList("car_{ip}");
+                            var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{_heartBeat.tcpip}").Result;
                             if (carInCache == null)
                             {
+                                var newCarModel = _heartBeat.ToCachedRecordModel();
                                 //add the car to the db
-                                _carDbService.AddCar();
-                                //add to the cache
-                                
-                                carInCache = RedisHelper.Instance.TryAddToCarList("car_{ip}", new CachedRecordingModel());
-
+                                _carDbService.AddCar(newCarModel);
+                                //add to the cache                                
+                                RedisHelper.Instance.TryAddToCarList($"car_{_heartBeat.tcpip}", newCarModel);
+                                carInCache = newCarModel;
                                 _cars.Add(carInCache);
                                 
                             }
 
 
                             if(carInCache.IsMainVehicle)
-                            {
-                                //get main car model
-
+                            {                                
                                 //update current postion
                                 carInCache.CurrentPosition = new CoordinateModel(_heartBeat.longitude, _heartBeat.latitude);
                                 //add to the coordinate list
@@ -200,7 +199,7 @@ namespace ShangqiSocket
                                 //trigger other route if possible
                                 foreach (var car in _cars)
                                 {
-                                    if(car.RouteStatus<2)
+                                    if(car.RouteStatus==1)
                                     {
                                         if (carInCache.TriggerPoint.IsInRange(_heartBeat.longitude,
                                             _heartBeat.latitude))
@@ -208,11 +207,38 @@ namespace ShangqiSocket
                                             //trigger the route now
                                             //go to auto pilot mode and send the coordinates to client
                                             var outbound = new OutboundModel();
+                                            outbound.IpAddress = carInCache.CarIp;
+                                            outbound.Data = new List<object>();
+                                            //切换⾄数据传输模式
+                                            outbound.Data.Add(new msg_control_cmd()
+                                            {
+                                                cmd = "1",
+                                                cmd_slave = "3",
+                                                route_id = "x"
+                                            });
+                                            //路径点与传输：
+
+                                            var msg_total = carInCache.ImpotedCoordinates.Count;
+                                            for(int i =0; i< msg_total; i++)
+                                            {
+                                                outbound.Data.Add(new msg_map_route
+                                                {
+                                                    msg_total = msg_total,
+                                                    msg_count = i + 1, //it starts with 1
+                                                    latitude = carInCache.ImpotedCoordinates[i].Latitude,
+                                                    longitude = carInCache.ImpotedCoordinates[i].Longitude                                                    
+
+                                                }) ;
+                                            }
+                                           
+                                            
+
                                             RedisHelper.Instance.SetCache("command", outbound).Wait();
                                             //update database with the  
-                                            car.IsDirty = true;
+                                            
                                             //update cache status to action
-                                            car.RouteStatus =2 ;
+                                            car.RouteStatus++;
+                                            car.IsDirty = true;
                                         }
                                     }
                                 }

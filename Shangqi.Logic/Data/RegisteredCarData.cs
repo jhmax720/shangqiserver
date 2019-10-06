@@ -14,10 +14,10 @@ namespace Shangqi.Logic.Data
 
         public bool IsMainCar { get; set; }
         public string IpAddress { get; set; }
-        public string Battery { get; set; }
+        public double Battery { get; set; }
 
-        [BsonElement("Status")]
-        public int Status { get; set; }
+        //[BsonElement("Status")]
+        //public int Status { get; set; }
 
         
     }

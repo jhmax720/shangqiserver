@@ -40,9 +40,9 @@ namespace Shangqi.Logic
 
         //true => added
         //false => not added
-        public CachedRecordingModel TryGetFromCarList(string key)
+        public async Task<CachedRecordingModel> TryGetFromCarList(string key)
         {
-            throw new NotImplementedException();
+            return await _cache.GetAsync<CachedRecordingModel>(key);
         }
 
         public CachedRecordingModel TryAddToCarList(string key, CachedRecordingModel model)

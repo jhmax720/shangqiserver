@@ -10,6 +10,7 @@ namespace Shangqi.Logic.Model
 
         public string Type { get; set; }
 
-        public object Data { get; set; }
+        public IList<object> Data { get; set; }
+        
     }
 }

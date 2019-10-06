@@ -44,9 +44,15 @@ namespace Shangqi.Logic.Services
             return list;
         }
 
-        public void AddCar()
+        public void AddCar(CachedRecordingModel model)
         {
+            var dbCar = new RegisteredCarData
+            {
+                Battery = model.Battery,
+                IpAddress = model.CarIp
+            };
 
+            _cars.InsertOne(dbCar);
         }
 
         public void AddNewCarRecord()
