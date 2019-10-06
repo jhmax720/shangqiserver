@@ -22,6 +22,10 @@ namespace ShangqiSocket
    
     class Program
     {
+        static string ConnectionString = "mongodb://localhost:27017";
+        static string DatabaseName = "Shangqidb";
+        
+
         //private static byte[] result = new byte[1024];
         private const int port = 5000;
         private static string IpStr = "127.0.0.1";
@@ -33,7 +37,30 @@ namespace ShangqiSocket
 
         static void Main(string[] args)
         {
-            _carDbService = new CarDbService("", "", "");
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    // do the work in the loop
+                    //string newData = DateTime.Now.ToLongTimeString();
+
+                    //// update the UI on the UI thread
+                    //Console.WriteLine("tick tock");
+                    foreach(var _carDirty in _cars)
+                    {
+                        if(_carDirty.IsDirty)
+                        {
+                            await _carDbService.SyncRoute(_carDirty);
+                            _carDirty.IsDirty = false;
+                        }
+                    }
+
+                    // don't run again for at least 200 milliseconds
+                    await Task.Delay(5000);
+                }
+            });
+
+            _carDbService = new CarDbService(ConnectionString, DatabaseName);
 
             IPAddress ip = IPAddress.Parse(IpStr);
             IPEndPoint ip_end_point = new IPEndPoint(IPAddress.Any, port);
@@ -45,7 +72,7 @@ namespace ShangqiSocket
             listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpclient), listener);
 
 
-            //sending
+            
 
 
 
@@ -54,6 +81,7 @@ namespace ShangqiSocket
             {
                 try
                 {
+                    //SEND COMMAND TO CLIENT
                     if (clients.Count > 0)
                     {
                         var model = RedisHelper.Instance.GetCacheItem<OutboundModel>("command").Result;
@@ -181,10 +209,10 @@ namespace ShangqiSocket
                                             //go to auto pilot mode and send the coordinates to client
                                             var outbound = new OutboundModel();
                                             RedisHelper.Instance.SetCache("command", outbound).Wait();
-                                            //update database with the cached coordinates 
-                                            _carDbService.UpdateRouteWithStatus(2);
+                                            //update database with the  
+                                            car.IsDirty = true;
                                             //update cache status to action
-                                            carInCache.RouteStatus =2 ;
+                                            car.RouteStatus =2 ;
                                         }
                                     }
                                 }

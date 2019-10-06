@@ -21,6 +21,7 @@ namespace Shangqi.Logic.Model
         public IList<CoordinateModel> ImpotedCoordinates { get; set; }
         public bool IsMainVehicle { get; set; }
 
+        public bool IsDirty { get; set; }
         public CachedRecordingModel()
         {
             CachedCoordinates = new List<CoordinateModel>();

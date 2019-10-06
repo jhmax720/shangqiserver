@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using Shangqi.Logic.Configuration;
 using Shangqi.Logic.Data;
@@ -14,23 +15,25 @@ namespace Shangqi.Logic.Services
 
         private IMongoCollection<RegisteredCarData> _cars;
         private IMongoCollection<CoordinateRecord> _coordinateRecordsCollection;
-
+        private IMongoCollection<Route> _routes;
 
         public CarDbService(DBSettings settings)
         {
-            Setup(settings.ConnectionString, settings.DatabaseName, settings.CarCollectionName);
+            Setup(settings.ConnectionString, settings.DatabaseName);
         }
 
-        private void Setup(string cs, string db, string car)
+        private void Setup(string cs, string db)
         {
             var client = new MongoClient(cs);
             var _db = client.GetDatabase(db);
-            _cars = _db.GetCollection<RegisteredCarData>(car);
+            _cars = _db.GetCollection<RegisteredCarData>(Const.DB_CARS);
+            _coordinateRecordsCollection = _db.GetCollection<CoordinateRecord>(Const.DB_COORDINATE_RECORD);
+            _routes = _db.GetCollection<Route>(Const.DB_ROUTE);
         }
 
-        public CarDbService(string cs, string db, string car)
+        public CarDbService(string cs, string db)
         {
-            Setup(cs, db, car);
+            Setup(cs, db);
         }
 
 
@@ -78,6 +81,29 @@ namespace Shangqi.Logic.Services
         public void UpdateRouteWithTriggerPoint(string recordId, string longtitude, string latitude)
         {
 
+        }
+
+        public async Task SyncRoute(CachedRecordingModel model)
+        {
+            if(model.RouteStatus == 2)
+            {
+                var result = await _routes.FindOneAndUpdateAsync(
+                                Builders<Route>.Filter.Eq(r => r.CarId, model.CarId),
+                                Builders<Route>.Update.Set(x => x.CarTrack, model.CachedCoordinates).Set(x => x.RouteStatus, model.RouteStatus)
+                                );
+            }
+            else
+            {
+                var result = await _routes.FindOneAndUpdateAsync(
+                                Builders<Route>.Filter.Eq(r => r.CarId, model.CarId),
+                                Builders<Route>.Update.Set(x => x.CarTrackReturn, model.CachedCoordinates).Set(x=>x.RouteStatus, model.RouteStatus)
+                                );
+            }
+
+            //await _routes.FindOneAndUpdateAsync(
+            //                    Builders<Route>.Filter.Eq(r => r.CarId, model.CarId),
+            //                    Builders<Route>.Update.Set(x => x.RouteStatus, model.RouteStatus).Set(x=>x.)
+            //                    );
         }
     }
 }

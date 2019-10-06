@@ -17,6 +17,12 @@ namespace Shangqi.Logic.Model
         [JsonProperty(PropertyName = "tcp/ip")]
         public string tcpip { get; set; }
 
+        //  robot_status 含义
+        //0 待机模式
+        //1 遥控器模式
+        //2 ⾃动驾驶模式
+        //3 远程控制模式
+        //4 路径传输模式
         [JsonProperty(PropertyName = "robot_status")]
         public int Status { get; set; }
 
