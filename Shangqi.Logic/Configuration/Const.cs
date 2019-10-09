@@ -12,5 +12,9 @@ namespace Shangqi.Logic.Configuration
 
         public static string CAR_COMMAND = "command";
         public static string MAIN_CAR_IP = "127.0.0.101";
+
+        //遥控器模式
+        public static int ROBOT_STATUS_REMOTE = 1;
+        public static int ROBOT_STATUS_AUTO_PILOT = 2;
     }
 }

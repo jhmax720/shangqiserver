@@ -18,6 +18,6 @@ namespace Shangqi.Logic.Data
         public string CarId { get; set; }
         
 
-        public CoordinateModel[] Coordinates { get; set; }
+        public Coordinate[] Coordinates { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace Shangqi.Logic
 
         public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source)
         {
-            var coo = new CoordinateModel(source.longitude, source.latitude);
+            var coo = new Coordinate(source.longitude, source.latitude);
             var cachedCachedRecordingModel = new CachedRecordingModel {
                 CarIp = source.tcpip,
                 CurrentPosition = coo                
@@ -99,7 +99,7 @@ namespace Shangqi.Logic
         //:::           GeoDataSource.com (C) All Rights Reserved 2018                :::
         //:::                                                                         :::
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        public static bool IsInRange(this CoordinateModel model, string longitude, string latitude)
+        public static bool IsInRange(this Coordinate model, string longitude, string latitude)
         {
             var long1 = Convert.ToDouble(model.Longitude);
             var lat1 = Convert.ToDouble(model.Latitude);

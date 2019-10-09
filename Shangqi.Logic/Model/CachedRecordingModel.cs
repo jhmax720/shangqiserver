@@ -29,16 +29,16 @@ namespace Shangqi.Logic.Model
         //5 return route triggered manually
         //6 return route completed
         public int RouteStatus { get; set; }
-        public int CarStatus { get; set; }
+        public int RobotStatus { get; set; }
 
         public double Battery { get; set; }
 
-        public CoordinateModel TriggerPoint { get; set; }
+        public Coordinate TriggerPoint { get; set; }
 
-        public CoordinateModel EndPoint { get; set; }
-        public CoordinateModel CurrentPosition { get; set; }
-        public IList<CoordinateModel> CachedCoordinates { get; set; }
-        public IList<CoordinateModel> ImpotedCoordinates { get; set; }
+        public Coordinate EndPoint { get; set; }
+        public Coordinate CurrentPosition { get; set; }
+        public IList<Coordinate> CachedCoordinates { get; set; }
+        public IList<Coordinate> ImpotedCoordinates { get; set; }
         public bool IsMainVehicle {
             get {
                 return this.CarIp == Const.MAIN_CAR_IP;
@@ -48,7 +48,7 @@ namespace Shangqi.Logic.Model
         public bool IsDirty { get; set; }
         public CachedRecordingModel()
         {
-            CachedCoordinates = new List<CoordinateModel>();
+            CachedCoordinates = new List<Coordinate>();
         }
     }
 }

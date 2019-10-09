@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Shangqi.Logic.Configuration;
 using Shangqi.Logic.Data;
@@ -17,9 +19,10 @@ namespace Shangqi.Logic.Services
         private IMongoCollection<CoordinateRecord> _coordinateRecordsCollection;
         private IMongoCollection<Route> _routes;
 
-        public CarDbService(DBSettings settings)
+        public CarDbService(IOptions<DBSettings>  settings)
         {
-            Setup(settings.ConnectionString, settings.DatabaseName);
+            var st = settings.Value;
+            Setup(st.ConnectionString, st.DatabaseName);
         }
 
         private void Setup(string cs, string db)
@@ -31,10 +34,10 @@ namespace Shangqi.Logic.Services
             _routes = _db.GetCollection<Route>(Const.DB_ROUTE);
         }
 
-        public CarDbService(string cs, string db)
-        {
-            Setup(cs, db);
-        }
+        //public CarDbService(string cs, string db)
+        //{
+        //    Setup(cs, db);
+        //}
 
 
         public IList<RegisteredCarData> List()
@@ -42,6 +45,11 @@ namespace Shangqi.Logic.Services
 
             var list = _cars.Find(car => !car.IsMainCar).ToList();
             return list;
+        }
+
+        public RegisteredCarData GetCar(string carId)
+        {
+            return _cars.Find(car => car.Id == carId).FirstOrDefault();
         }
 
         public void AddCar(CachedRecordingModel model)
@@ -55,26 +63,41 @@ namespace Shangqi.Logic.Services
             _cars.InsertOne(dbCar);
         }
 
-        public void AddNewCarRecord()
+        public void AddNewCarRecord(string carId)
         {
-            var record = new CoordinateRecord();
+            var record = new CoordinateRecord() {
+                CarId = carId,
+                Coordinates = new Coordinate[] { }
+            };
             //add this to db
             _coordinateRecordsCollection.InsertOne(record);
         }
 
-        public void EndCarRecord(string recordId)
+        public void EndCarRecording(string carId, IList<Coordinate> coordinates)
         {
+            var lcr = _coordinateRecordsCollection.Find(c => c.CarId == carId).SortByDescending(c => c.Id)
+                .FirstOrDefault();
+            
 
+            _coordinateRecordsCollection.UpdateOne(Builders<CoordinateRecord>.Filter.Eq(r => r.Id, lcr.Id),
+                Builders<CoordinateRecord>.Update.Set(x => x.Coordinates, coordinates.ToArray()));
         }
 
-        public void AddRoute(CoordinateModel[] importedCoordinates )
+        public CoordinateRecord GetCoordinateRecord(string carId)
+        {
+            var lcr = _coordinateRecordsCollection.Find(c => c.CarId == carId).SortByDescending(c => c.Id)
+                .FirstOrDefault();
+            return lcr;
+        }
+
+        public void AddRoute(Coordinate[] importedCoordinates )
         {
             var route = new Route();
             route.ImportedCarTrack = importedCoordinates;
             //todo call db.save()
         }
 
-        public void UpdateRouteWithCoordinates(CoordinateModel[] coordinates, bool isReturn = false)
+        public void UpdateRouteWithCoordinates(Coordinate[] coordinates, bool isReturn = false)
         {
 
         }

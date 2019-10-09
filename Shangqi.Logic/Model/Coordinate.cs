@@ -5,9 +5,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Shangqi.Logic.Model
 {
-    public class CoordinateModel
+    public class Coordinate
     {
-        public CoordinateModel(string longitude, string latitude)
+        public Coordinate(string longitude, string latitude)
         {
             this.Longitude = longitude;
             this.Latitude = latitude;
