@@ -33,14 +33,15 @@ namespace ShangqiSocketClient
                     
 
 
-                    Console.WriteLine("please enter something：");
-                    string sendStr = Console.ReadLine();
+                    Console.WriteLine("please enter longitude：");
+                    string longitude = Console.ReadLine();
+                    Console.WriteLine("please enter latitude：");
+                    string latitude = Console.ReadLine();
 
-                    if (sendStr == "exit")
-                        break;
+                    
 
                     //Test
-                    sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""192.168.0.100:5050"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": 2231.30538, ""latitude"": 11353.76058, ""battery"":90, ""check"": 8}";
+                    var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""192.168.0.100:5050"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": "+ longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
                     byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
                     clientSocket.Send(sendBytes);
 

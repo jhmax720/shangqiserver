@@ -120,8 +120,17 @@ namespace ShangqiApi.Controllers
         //STEP 3 EXPORT THE COORDINATES IN CSV
         public ActionResult ExportCoordinateRecord(string carId)
         {
-            var coordinates = "1,2,3,4";
-            var result = new FileContentResult(System.Text.Encoding.ASCII.GetBytes(coordinates), "application/octet-stream");
+            //var coordinates = "1,2,3,4";
+            var coordinateRecord = _carService.GetCoordinateRecord(carId);
+            var sb = new StringBuilder();
+
+            foreach (var coordinate in coordinateRecord.Coordinates)
+            {
+                sb.AppendLine($"{coordinate.Latitude}, {coordinate.Longitude}");
+            }
+
+
+            var result = new FileContentResult(System.Text.Encoding.ASCII.GetBytes(sb.ToString()), "application/octet-stream");
             result.FileDownloadName = "my-csv-file.csv";
             return result;
         }

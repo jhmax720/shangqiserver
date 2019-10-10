@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Shangqi.Logic.Model
 {
+    [Serializable()]
     public class Coordinate
     {
         public Coordinate(string longitude, string latitude)

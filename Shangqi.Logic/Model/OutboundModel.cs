@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Shangqi.Logic.Model
 {
+    [Serializable()]
     public class OutboundModel
     {
         public string IpAddress { get; set; }

@@ -45,10 +45,7 @@ namespace Shangqi.Logic
             return await _cache.GetAsync<CachedRecordingModel>(key);
         }
 
-        public CachedRecordingModel TryAddToCarList(string key, CachedRecordingModel model)
-        {
-            throw new NotImplementedException();
-        }
+      
 
 
         public void SetNormalCache(string key, byte[] value)

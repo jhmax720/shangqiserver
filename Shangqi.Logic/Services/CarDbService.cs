@@ -59,8 +59,12 @@ namespace Shangqi.Logic.Services
                 Battery = model.Battery,
                 IpAddress = model.CarIp
             };
-
-            _cars.InsertOne(dbCar);
+            var count = _cars.Find<RegisteredCarData>(Builders<RegisteredCarData>.Filter.Eq(r => r.IpAddress, model.CarIp)).CountDocuments();
+            if (count == 0)
+            {
+                _cars.InsertOne(dbCar);
+            }
+            //_cars.fino(Builders<RegisteredCarData>.Filter.Eq(r => r.IpAddress, model.CarIp), dbCar);
         }
 
         public void AddNewCarRecord(string carId)
@@ -70,7 +74,13 @@ namespace Shangqi.Logic.Services
                 Coordinates = new Coordinate[] { }
             };
             //add this to db
-            _coordinateRecordsCollection.InsertOne(record);
+            var count = _coordinateRecordsCollection.Find<CoordinateRecord>(Builders<CoordinateRecord>.Filter.Eq(r => r.CarId, carId)).CountDocuments();
+            if (count == 0)
+            {
+                _coordinateRecordsCollection.InsertOne(record);
+            }
+            //_coordinateRecordsCollection.FindOneAndReplace(Builders<CoordinateRecord>.Filter.Eq(r => r.CarId, carId),record);
+            
         }
 
         public void EndCarRecording(string carId, IList<Coordinate> coordinates)

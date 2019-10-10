@@ -196,9 +196,10 @@ namespace ShangqiSocket
                                 //add the car to the db
                                 _carDbService.AddCar(newCarModel);
                                 //add to the cache                                
-                                RedisHelper.Instance.TryAddToCarList($"car_{_heartBeat.tcpip}", newCarModel);
+                                RedisHelper.Instance.SetCache($"car_{_heartBeat.tcpip}", newCarModel).Wait();
                                 carInCache = newCarModel;
                                 _cars.Add(carInCache);
+                                Logger.Instance.Log(LogLevel.Information, "new robot added successfully " + _heartBeat.tcpip);
                                 
                             }
 
@@ -261,6 +262,7 @@ namespace ShangqiSocket
                             {   //verify the car status in cache consitent with client
                                 if (_heartBeat.Status == carInCache.RobotStatus)
                                 {
+                                    Console.WriteLine($"Robot {_heartBeat.tcpip} status {_heartBeat.Status}");
                                     //recording
                                     //// 1 == REMOTE CONTROL MODE
                                     if (_heartBeat.Status == Const.ROBOT_STATUS_REMOTE)

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Shangqi.Logic.Model.Outbound
 {
+    [Serializable()]
     public class msg_control_cmd
     {
         public int msg_count { get; set; }

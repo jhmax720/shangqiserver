@@ -14,6 +14,7 @@ namespace Shangqi.Logic.Model
 
 
     }
+    [Serializable()]
 
     public class CachedRecordingModel
     {
