@@ -56,7 +56,7 @@ namespace ShangqiApi.Controllers
                 await RedisHelper.Instance.SetCache($"car_{car.IpAddress}", carInCache);
 
                 //add to db
-                 _carService.AddNewCarRecord(carId);
+                _carService.AddNewCarRecord(carId);
 
 
                 //send to robot to start recording
@@ -68,7 +68,8 @@ namespace ShangqiApi.Controllers
                 };
 
 
-                var outbound = new OutboundModel() {
+                var outbound = new OutboundModel()
+                {
                     IpAddress = carInCache.CarIp,
                     Data = new List<object> { msg }
                 };
@@ -79,7 +80,7 @@ namespace ShangqiApi.Controllers
             {
                 return BadRequest();
             }
-            
+
 
         }
         [HttpPost("recording/end")]
@@ -91,7 +92,7 @@ namespace ShangqiApi.Controllers
             //save cached coordinates to database
             var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.IpAddress}");
             _carService.EndCarRecording(carId, carInCache.CachedCoordinates);
-            
+
             //update robot status in cache
             carInCache.RobotStatus = 0;
             await RedisHelper.Instance.SetCache($"car_{car.IpAddress}", carInCache);
@@ -124,52 +125,52 @@ namespace ShangqiApi.Controllers
             result.FileDownloadName = "my-csv-file.csv";
             return result;
         }
-        //STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
-        public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
-        {
-            //get the coordinates from uploaded CSV
-            var selected_Coordinates = new Coordinate[] { };
+        ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
+        //public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
+        //{
+        //    //get the coordinates from uploaded CSV
+        //    var selected_Coordinates = new Coordinate[] { };
 
-            //create a new route in db
-            _carService.AddRoute(selected_Coordinates);
-
-
-
-            //update the end position in cache
-            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
-            cached.EndPoint = new Coordinate("","");
+        //    //create a new route in db
+        //    _carService.AddRoute(selected_Coordinates);
 
 
 
-        }
+        //    //update the end position in cache
+        //    var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
+        //    cached.EndPoint = new Coordinate("","");
 
-        //STEP 5 ADD TRIGGER POINT FOR THE ROUTE
-        public async Task AddTriggerCoordinateForRoute(string routeId, string longitude, string latitude)
-        {
-            //update the route in db
-            _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
-            //update the route in cache
-            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
-            cached.TriggerPoint = new Coordinate(longitude, latitude);
 
-        }
 
-        //STEP N.. TRIGGER RETURN ROUTE
-        public async Task xx()
-        {
-            
-            
-            //go to auto pilot mode and send the coordinates to client
-            var outbound = new OutboundModel();
-            RedisHelper.Instance.SetCache("command", outbound).Wait();
-            //update database with the cached coordinates 
-            _carService.UpdateRouteWithStatus(4);
-            //update cache status to return in progress
-            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
-            cached.RouteStatus = 4;
-            cached.CachedCoordinates = new List<Coordinate>();
+        //}
 
-        }
+        ////STEP 5 ADD TRIGGER POINT FOR THE ROUTE
+        //public async Task AddTriggerCoordinateForRoute(string routeId, string longitude, string latitude)
+        //{
+        //    //update the route in db
+        //    _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
+        //    //update the route in cache
+        //    var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
+        //    cached.TriggerPoint = new Coordinate(longitude, latitude);
+
+        //}
+
+        ////STEP N.. TRIGGER RETURN ROUTE
+        //public async Task xx()
+        //{
+
+
+        //    //go to auto pilot mode and send the coordinates to client
+        //    var outbound = new OutboundModel();
+        //    RedisHelper.Instance.SetCache("command", outbound).Wait();
+        //    //update database with the cached coordinates 
+        //    _carService.UpdateRouteWithStatus(4);
+        //    //update cache status to return in progress
+        //    var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
+        //    cached.RouteStatus = 4;
+        //    cached.CachedCoordinates = new List<Coordinate>();
+
+        //}
 
     }
 }

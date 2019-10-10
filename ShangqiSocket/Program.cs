@@ -62,7 +62,14 @@ namespace ShangqiSocket
                 }
             });
 
-            _carDbService = new CarDbService(ConnectionString, DatabaseName);
+            var dbSettings = new DBSettings()
+            {
+                ConnectionString = "mongodb://localhost:27017",
+                DatabaseName = "Shangqidb"
+            };
+            
+
+            _carDbService = new CarDbService(Options.Create(dbSettings));
 
             IPAddress ip = IPAddress.Parse(IpStr);
             IPEndPoint ip_end_point = new IPEndPoint(IPAddress.Any, port);

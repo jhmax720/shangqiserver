@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shangqi.Logic.Configuration;
 using Shangqi.Logic.Services;
+using Microsoft.OpenApi.Models;
 
 namespace ShangqiApi
 {
@@ -44,6 +45,12 @@ namespace ShangqiApi
 
 
             services.AddSingleton<CarDbService>();
+
+            // Register the Swagger generator, defining 1 or more Swagger documents
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShangQi API", Version = "v1" });
+            });
 
         }
 
@@ -74,7 +81,14 @@ namespace ShangqiApi
             {
                 routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
-            
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
+
         }
     }
 }
