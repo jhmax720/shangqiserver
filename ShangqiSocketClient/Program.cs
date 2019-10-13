@@ -41,7 +41,7 @@ namespace ShangqiSocketClient
                     
 
                     //Test
-                    var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""192.168.0.100:5050"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": "+ longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
+                    var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""127.0.0.1:49426"", ""msg_count"": 42, ""robot_status"":0, ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": " + longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
                     byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
                     clientSocket.Send(sendBytes);
 

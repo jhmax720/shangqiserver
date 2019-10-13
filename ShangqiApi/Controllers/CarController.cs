@@ -116,7 +116,7 @@ namespace ShangqiApi.Controllers
             return Ok();
         }
 
-        [HttpPost("recording/export")]
+        [HttpGet("recording/export")]
         //STEP 3 EXPORT THE COORDINATES IN CSV
         public ActionResult ExportCoordinateRecord(string carId)
         {

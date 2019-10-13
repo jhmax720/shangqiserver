@@ -97,22 +97,28 @@ namespace ShangqiSocket
                         if (model != null)
                         {
                             Logger.Instance.Log(LogLevel.Information, $"sending command to robot ip: {model.IpAddress}");
-                            var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.IpAddress);
-                            var stream = client.GetStream();
-                            //string msg = "static message from max";
-                            //byte[] result = new byte[1024];
-                            //var result = Encoding.UTF8.GetBytes(msg);
-                            foreach(var obj in model.Data)
+                            //var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.IpAddress);
+                            var client = clients.FirstOrDefault(); //todo remove this after local testing
+                            if(client!=null)
                             {
-                                var result = ObjectToByteArray(obj);
+                                var stream = client.GetStream();
+                            
+                                foreach (var obj in model.Data)
+                                {
+                                    var jsonStr = JsonConvert.SerializeObject(obj);
 
-                                //TODO RESET CACHED COORDINATES
 
-                                
-                                
-                                stream.Write(result, 0, result.Length);
-                                stream.Flush();
+                                    var result = Encoding.ASCII.GetBytes(jsonStr);
+
+                                    //TODO RESET CACHED COORDINATES
+
+
+
+                                    stream.Write(result, 0, result.Length);
+                                    stream.Flush();
+                                }
                             }
+                            
                           
                             RedisHelper.Instance.ClearKey("command");
                         }
@@ -192,6 +198,9 @@ namespace ShangqiSocket
                             var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{_heartBeat.tcpip}").Result;
                             if (carInCache == null)
                             {
+                                //TODO REMOVE THIS LINE
+                                _heartBeat.tcpip = client.Client.RemoteEndPoint.ToString();
+                                Console.WriteLine("add new robot to db "+ _heartBeat.tcpip);
                                 var newCarModel = _heartBeat.ToCachedRecordModel();
                                 //add the car to the db
                                 _carDbService.AddCar(newCarModel);
