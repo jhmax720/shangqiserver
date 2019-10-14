@@ -24,10 +24,7 @@ namespace ShangqiSocket
    
     class Program
     {
-        static string ConnectionString = "mongodb://localhost:27017";
-        static string DatabaseName = "Shangqidb";
-        
-
+    
         //private static byte[] result = new byte[1024];
         private const int port = 5000;
         private static string IpStr = "127.0.0.1";
