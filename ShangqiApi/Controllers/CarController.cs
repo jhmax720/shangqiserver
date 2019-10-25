@@ -131,7 +131,7 @@ namespace ShangqiApi.Controllers
 
 
             var result = new FileContentResult(System.Text.Encoding.ASCII.GetBytes(sb.ToString()), "application/octet-stream");
-            result.FileDownloadName = "my-csv-file.csv";
+            result.FileDownloadName = "export_route.csv";
             return result;
         }
         ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
