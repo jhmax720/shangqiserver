@@ -192,20 +192,20 @@ namespace ShangqiSocket
 
                             //Check if the car is in cache
                             //get cache car list
-                            var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{_heartBeat.tcpip}").Result;
+                            var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{client.Client.RemoteEndPoint.ToString()}").Result;
                             if (carInCache == null)
                             {
                                 //TODO REMOVE THIS LINE
-                                _heartBeat.tcpip = client.Client.RemoteEndPoint.ToString();
-                                Console.WriteLine("add new robot to db "+ _heartBeat.tcpip);
-                                var newCarModel = _heartBeat.ToCachedRecordModel();
+                                //_heartBeat.tcpip = client.Client.RemoteEndPoint.ToString();
+                                Console.WriteLine("add new robot to db "+ client.Client.RemoteEndPoint.ToString());
+                                var newCarModel = _heartBeat.ToCachedRecordModel(client.Client.RemoteEndPoint.ToString());
                                 //add the car to the db
                                 _carDbService.AddCar(newCarModel);
                                 //add to the cache                                
-                                RedisHelper.Instance.SetCache($"car_{_heartBeat.tcpip}", newCarModel).Wait();
+                                RedisHelper.Instance.SetCache($"car_{client.Client.RemoteEndPoint.ToString()}", newCarModel).Wait();
                                 carInCache = newCarModel;
                                 _cars.Add(carInCache);
-                                Logger.Instance.Log(LogLevel.Information, "new robot added successfully " + _heartBeat.tcpip);
+                                Logger.Instance.Log(LogLevel.Information, "new robot added successfully " + client.Client.RemoteEndPoint.ToString());
                                 
                             }
 
@@ -266,18 +266,18 @@ namespace ShangqiSocket
                             }
                             else
                             {   //verify the car status in cache consitent with client
-                                if (_heartBeat.Status == carInCache.RobotStatus)
+                                if (_heartBeat.robot_status == carInCache.RobotStatus)
                                 {
-                                    Console.WriteLine($"Robot {_heartBeat.tcpip} status {_heartBeat.Status}");
+                                    Console.WriteLine($"Robot {client.Client.RemoteEndPoint.ToString()} status {_heartBeat.robot_status}");
                                     //recording
                                     //// 1 == REMOTE CONTROL MODE
-                                    if (_heartBeat.Status == Const.ROBOT_STATUS_REMOTE)
+                                    if (_heartBeat.robot_status == Const.ROBOT_STATUS_REMOTE)
                                     {
                                         //add the coordinate to the cache
                                         carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));
                                     }
                                     //2 == AUTO PILOT MODE
-                                    else if (_heartBeat.Status == Const.ROBOT_STATUS_AUTO_PILOT)
+                                    else if (_heartBeat.robot_status == Const.ROBOT_STATUS_AUTO_PILOT)
                                     {
                                         //add the coordinates to the cache
                                         carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));

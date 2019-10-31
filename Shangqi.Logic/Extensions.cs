@@ -13,11 +13,11 @@ namespace Shangqi.Logic
     public static class Extensions
     {
 
-        public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source)
+        public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source, string robotIp)
         {
             var coo = new Coordinate(source.longitude, source.latitude);
             var cachedCachedRecordingModel = new CachedRecordingModel {
-                CarIp = source.tcpip,
+                CarIp = robotIp,
                 CurrentPosition = coo                
 
             };
@@ -99,13 +99,13 @@ namespace Shangqi.Logic
         //:::           GeoDataSource.com (C) All Rights Reserved 2018                :::
         //:::                                                                         :::
         //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        public static bool IsInRange(this Coordinate model, string longitude, string latitude)
+        public static bool IsInRange(this Coordinate model, double longitude, double latitude)
         {
-            var long1 = Convert.ToDouble(model.Longitude);
-            var lat1 = Convert.ToDouble(model.Latitude);
+            var long1 = model.Longitude;
+            var lat1 = model.Latitude;
 
-            var long2 = Convert.ToDouble(longitude);
-            var lat2 = Convert.ToDouble(latitude);
+            var long2 = longitude;
+            var lat2 = latitude;
 
             var dist = GeoHelper.Distance(lat1, long1, lat2, long2, 'K');
 

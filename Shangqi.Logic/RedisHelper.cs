@@ -12,9 +12,7 @@ namespace Shangqi.Logic
     public class RedisHelper
     {
         private IDistributedCache _cache;
-
-        private IDictionary<string, IList<CachedRecordingModel>> _carCollection; 
-
+        
         private RedisHelper()
         {
             _cache = new RedisCache(new MyRedisOptions());

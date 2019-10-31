@@ -9,9 +9,9 @@ namespace Shangqi.Logic.Model.Outbound
     {
         public int msg_count { get; set; }
         public int msg_total { get; set; }
-        public string longitude { get; set; }
+        public double longitude { get; set; }
 
-        public string latitude { get; set; }
+        public double latitude { get; set; }
 
         public string route_id { get; set; }
         public string check { get; set; }
