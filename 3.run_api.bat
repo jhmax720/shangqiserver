@@ -1,1 +1,1 @@
-dotnet .\ShangqiApi\bin\Debug\netcoreapp2.2\ShangqiApi.dll
+dotnet run -p .\ShangqiApi\

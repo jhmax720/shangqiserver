@@ -40,13 +40,17 @@ namespace ShangqiSocketClient
                     Console.WriteLine("please enter robot status: '1-5'：");
                     string robotStatus = Console.ReadLine();
 
-                    //Test
-                    //var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""127.0.0.1:49426"", ""msg_count"": 42, ""robot_status"": "+robotStatus+ @", ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": " + longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
+                    //Scenaria 1 Test normal payload                   
+                    //var sendStr = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude +@", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": "+ robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": "+ latitude +"}";
+                    //byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
+                    //clientSocket.Send(sendBytes);
 
-                    var sendStr = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude +@", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": "+ robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": "+ latitude +"}";
+                    //Scenaria 2 Test bad payload
+                    var sendStr2 = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude + @", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": " + robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": " + latitude + "}";
+                    var sendStr3 = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude + @", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": " + robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": " + latitude + "}";
 
-                    byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
-                    clientSocket.Send(sendBytes);
+                    byte[] sendBytes2 = Encoding.ASCII.GetBytes(sendStr2 + sendStr3);
+                    clientSocket.Send(sendBytes2);
 
                     //receive message
 
