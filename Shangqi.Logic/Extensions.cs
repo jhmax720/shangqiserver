@@ -12,6 +12,19 @@ namespace Shangqi.Logic
 {
     public static class Extensions
     {
+        public static string FormatValidJson(this string source)
+        {
+            var sb = new StringBuilder(source);
+            if(source!=null && !source.StartsWith("{"))
+            {
+                sb.Insert(0, "{");
+            }
+            if(source != null && !source.EndsWith("}"))
+            {
+                sb.Append("}");
+            }
+            return sb.ToString();
+        }
 
         public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source, string robotIp)
         {

@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shangqi.Logic", "Shangqi.Lo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{97A4DEB7-0BAE-43EA-98C2-E1114358554B}"
 	ProjectSection(SolutionItems) = preProject
+		1.run_build_all.bat = 1.run_build_all.bat
+		2.run_socket.bat = 2.run_socket.bat
+		3.run_api.bat = 3.run_api.bat
+		4.run_socket_client.bat = 4.run_socket_client.bat
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -23,6 +23,14 @@ Start up:
 	
 	Run "redis-server" from a command line
 
-2. Build the solution, and Go to bin folder of the ShangqiSocket project and Run 'dotnet ShangqiSocket.dll' for the socket server, default port is: 5000
+2. Make sure the solution builds ok.
 
-3. Go to bin folder of the ShangqiApi project Run 'dotnet ShangqiApi.dll' for the API project. refer to the swagger UI for more details: https://localhost:5001/index.html
+3. Run the following bash files:
+
+   1.run_build_all.bat
+
+   2.run_socket.bat
+
+   3.run_api.bat
+
+   4.run_socket_client.bat (optional, if you are testing with a fake client)

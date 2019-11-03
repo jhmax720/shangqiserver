@@ -28,11 +28,11 @@ namespace ShangqiApi.Controllers
             _carService = carService;
         }
         // GET api/car/list
-        [HttpGet("list")]
-        public IList<RegisteredCarData> Get()
+        [HttpGet("cache/list")]
+        public async Task<IList<CachedRecordingModel>> Get()
         {
-            var l = _carService.List();
-          
+            //var l = _carService.List();
+            var l = await RedisHelper.Instance.GetCurrentCarsInCache();
             
 
             return l;

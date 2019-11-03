@@ -22,9 +22,12 @@ namespace ShangqiApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
+            //var builder = new ConfigurationBuilder()
+            //.SetBasePath(env.ContentRootPath)
+            //.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
         }
 
         public IConfiguration Configuration { get; }

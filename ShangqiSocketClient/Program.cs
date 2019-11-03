@@ -13,7 +13,7 @@ namespace ShangqiSocketClient
             {
                 Console.WriteLine("starting socket client..");
 
-                int port = 5000;
+                int port = 3388;
                 string host = "127.0.0.1";//服务器端ip地址
                 //int port = 8007;
                 //string host = "localhost";//服务器端ip地址
@@ -41,7 +41,10 @@ namespace ShangqiSocketClient
                     string robotStatus = Console.ReadLine();
 
                     //Test
-                    var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""127.0.0.1:49426"", ""msg_count"": 42, ""robot_status"": "+robotStatus+ @", ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": " + longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
+                    //var sendStr = @"{""type"": ""heart"", ""tcp/ip"" :""127.0.0.1:49426"", ""msg_count"": 42, ""robot_status"": "+robotStatus+ @", ""error"" : 10, ""rtk_qual"": 14, ""route_id"": 1, ""route_status"" :3, ""longitude"": " + longitude + @", ""latitude"": " + latitude+  @", ""battery"":90, ""check"": 8}";
+
+                    var sendStr = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude +@", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": "+ robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": "+ latitude +"}";
+
                     byte[] sendBytes = Encoding.ASCII.GetBytes(sendStr);
                     clientSocket.Send(sendBytes);
 

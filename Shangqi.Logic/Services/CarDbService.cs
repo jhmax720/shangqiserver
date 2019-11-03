@@ -52,6 +52,11 @@ namespace Shangqi.Logic.Services
             return _cars.Find(car => car.Id == carId).FirstOrDefault();
         }
 
+        public RegisteredCarData GetCarByIp(string carIp)
+        {
+            return _cars.Find(car => car.IpAddress == carIp).FirstOrDefault();
+        }
+
         public void AddCar(CachedRecordingModel model)
         {
             var dbCar = new RegisteredCarData

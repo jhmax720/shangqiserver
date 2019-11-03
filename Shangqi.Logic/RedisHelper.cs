@@ -15,7 +15,7 @@ namespace Shangqi.Logic
         
         private RedisHelper()
         {
-            _cache = new RedisCache(new MyRedisOptions());
+            _cache = new RedisCache(new MyRedisOptions());            
         }
         private static RedisHelper _instance = null;
         public static RedisHelper Instance
@@ -28,6 +28,18 @@ namespace Shangqi.Logic
                 }
                 return _instance;
             }
+        }
+
+        public async Task<List<CachedRecordingModel>> GetCurrentCarsInCache()
+        {
+
+            var l =await _cache.GetAsync<List<CachedRecordingModel>>("AllRobots");
+            return l;
+        }
+
+        public async Task UpdateCurrentCarsInCache(List<CachedRecordingModel> list)
+        {
+            await _cache.SetAsync<List<CachedRecordingModel>>("AllRobots", list, new DistributedCacheEntryOptions());
         }
 
         public async Task SetCache<T>(string key, T model) where T : class, new()
@@ -43,7 +55,7 @@ namespace Shangqi.Logic
             return await _cache.GetAsync<CachedRecordingModel>(key);
         }
 
-      
+        
 
 
         public void SetNormalCache(string key, byte[] value)
