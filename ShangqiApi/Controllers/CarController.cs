@@ -116,12 +116,22 @@ namespace ShangqiApi.Controllers
             return Ok();
         }
 
+
+
+        [HttpGet("recording/list")]
+        public IList<CoordinateRecord> GetRecordingList(string carId)
+        {
+            
+            var l = _carService.GetCoordinateRecordsforCar(carId);
+            return l;
+        }
+
         [HttpGet("recording/export")]
         //STEP 3 EXPORT THE COORDINATES IN CSV
-        public ActionResult ExportCoordinateRecord(string carId)
+        public ActionResult ExportCoordinateRecord(string recordId)
         {
             //var coordinates = "1,2,3,4";
-            var coordinateRecord = _carService.GetCoordinateRecord(carId);
+            var coordinateRecord = _carService.GetCoordinateRecord(recordId);
             var sb = new StringBuilder();
 
             foreach (var coordinate in coordinateRecord.Coordinates)
@@ -134,24 +144,56 @@ namespace ShangqiApi.Controllers
             result.FileDownloadName = "export_route.csv";
             return result;
         }
+
+
+
+        [HttpPost("recording/import")]
         ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
-        //public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false )
-        //{
-        //    //get the coordinates from uploaded CSV
-        //    var selected_Coordinates = new Coordinate[] { };
+        public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false)
+        {
+            //get the coordinates from uploaded CSV
+            
+            var formFile = HttpContext.Request.Form.Files[0];
 
-        //    //create a new route in db
-        //    _carService.AddRoute(selected_Coordinates);
+            if(formFile!=null)
+            {
+                var list = new List<Coordinate>();
+                using (var ms = new MemoryStream())
+                {
+                    formFile.CopyTo(ms);
+                    ms.Position = 0;
+
+                    StreamReader reader = new StreamReader(ms);
+                    
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        var values = line.Split(',');
+                        var anc = new Coordinate( double.Parse(values[0]), double.Parse(values[1]));
+                        list.Add(anc);
+                    }
+
+                }
+                //create a new route in db
+                _carService.AddRoute(carId, list.ToArray());
+                ////update the end position in cache
+                var carData = _carService.GetCar(carId);
+                var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.IpAddress}");
+                cached.EndPoint = list.LastOrDefault();
+                await RedisHelper.Instance.SetCache($"car_{carData.IpAddress}", cached);
+            }
 
 
 
-        //    //update the end position in cache
-        //    var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
-        //    cached.EndPoint = new Coordinate("","");
 
 
 
-        //}
+
+
+
+
+
+        }
 
         ////STEP 5 ADD TRIGGER POINT FOR THE ROUTE
         //public async Task AddTriggerCoordinateForRoute(string routeId, string longitude, string latitude)

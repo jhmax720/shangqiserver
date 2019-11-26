@@ -19,5 +19,6 @@ namespace Shangqi.Logic.Data
         
 
         public Coordinate[] Coordinates { get; set; }
+        public bool IsComplete { get; set; }
     }
 }

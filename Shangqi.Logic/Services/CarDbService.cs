@@ -78,38 +78,57 @@ namespace Shangqi.Logic.Services
                 CarId = carId,
                 Coordinates = new Coordinate[] { }
             };
+
+            IList<FilterDefinition<CoordinateRecord>> filters = new List<FilterDefinition<CoordinateRecord>>();
+
             //add this to db
-            var count = _coordinateRecordsCollection.Find<CoordinateRecord>(Builders<CoordinateRecord>.Filter.Eq(r => r.CarId, carId)).CountDocuments();
+            var count = _coordinateRecordsCollection.Find<CoordinateRecord>(
+                Builders<CoordinateRecord>.Filter.Eq(r => r.CarId, carId) & 
+                Builders<CoordinateRecord>.Filter.Eq(r => r.IsComplete, false))
+                .CountDocuments();
             if (count == 0)
             {
                 _coordinateRecordsCollection.InsertOne(record);
             }
+
+
             //_coordinateRecordsCollection.FindOneAndReplace(Builders<CoordinateRecord>.Filter.Eq(r => r.CarId, carId),record);
             
         }
 
         public void EndCarRecording(string carId, IList<Coordinate> coordinates)
         {
-            var lcr = _coordinateRecordsCollection.Find(c => c.CarId == carId).SortByDescending(c => c.Id)
+            var lcr = _coordinateRecordsCollection.Find(c => c.CarId == carId && !c.IsComplete).SortByDescending(c => c.Id)
                 .FirstOrDefault();
             
 
-            _coordinateRecordsCollection.UpdateOne(Builders<CoordinateRecord>.Filter.Eq(r => r.Id, lcr.Id),
-                Builders<CoordinateRecord>.Update.Set(x => x.Coordinates, coordinates.ToArray()));
+            _coordinateRecordsCollection.UpdateOne(Builders<CoordinateRecord>.Filter
+                .Eq(r => r.Id, lcr.Id),
+                Builders<CoordinateRecord>.Update
+                .Set(x => x.Coordinates, coordinates.ToArray())
+                .Set(x => x.IsComplete, true));
         }
 
-        public CoordinateRecord GetCoordinateRecord(string carId)
+        public List<CoordinateRecord> GetCoordinateRecordsforCar(string carId)
         {
-            var lcr = _coordinateRecordsCollection.Find(c => c.CarId == carId).SortByDescending(c => c.Id)
+            var list = _coordinateRecordsCollection.Find(c => c.Id == carId).SortByDescending(c => c.Id).ToList();                
+            return list;
+        }
+
+        public CoordinateRecord GetCoordinateRecord(string recordId)
+        {
+            var lcr = _coordinateRecordsCollection.Find(c => c.Id == recordId).SortByDescending(c => c.Id)
                 .FirstOrDefault();
             return lcr;
         }
 
-        public void AddRoute(Coordinate[] importedCoordinates )
+        public void AddRoute(string carId, Coordinate[] importedCoordinates )
         {
             var route = new Route();
             route.ImportedCarTrack = importedCoordinates;
-            //todo call db.save()
+            route.CarId = carId;
+            _routes.InsertOne(route);
+
         }
 
         public void UpdateRouteWithCoordinates(Coordinate[] coordinates, bool isReturn = false)
