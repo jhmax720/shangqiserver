@@ -42,6 +42,14 @@ namespace Shangqi.Logic.Model
 
         [JsonProperty(PropertyName = "check")]
         public string check { get; set; }
-        
+
+        [JsonProperty]
+        public string type
+        {
+            get { return "heart"; }
+        }
+
+        [JsonProperty]
+        public int speed { get; set; }
     }
 }

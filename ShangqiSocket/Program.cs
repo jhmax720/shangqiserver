@@ -94,8 +94,8 @@ namespace ShangqiSocket
                         if (model != null)
                         {
                             Logger.Instance.Log(LogLevel.Information, $"sending command to robot ip: {model.IpAddress}");
-                            //var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.IpAddress);
-                            var client = clients.FirstOrDefault(); //todo remove this after local testing
+                            var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.IpAddress);
+                            //var client = clients.FirstOrDefault(); //todo remove this after local testing
                             if(client!=null)
                             {
                                 var stream = client.GetStream();
