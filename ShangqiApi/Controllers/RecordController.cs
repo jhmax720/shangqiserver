@@ -20,15 +20,15 @@ namespace ShangqiApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CarController : ControllerBase
+    public class RecordController : ControllerBase
     {
         private readonly CarDbService _carService;
-        public CarController(CarDbService carService)
+        public RecordController(CarDbService carService)
         {
             _carService = carService;
         }
-        // GET api/car/list
-        [HttpGet("cache/list")]
+        
+        [HttpGet("car/cache/list")]
         public async Task<IList<CachedRecordingModel>> Get()
         {
             //var l = _carService.List();
@@ -147,64 +147,9 @@ namespace ShangqiApi.Controllers
 
 
 
-        [HttpPost("recording/import")]
-        ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
-        public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false)
-        {
-            //get the coordinates from uploaded CSV
-            
-            var formFile = HttpContext.Request.Form.Files[0];
+        
 
-            if(formFile!=null)
-            {
-                var list = new List<Coordinate>();
-                using (var ms = new MemoryStream())
-                {
-                    formFile.CopyTo(ms);
-                    ms.Position = 0;
-
-                    StreamReader reader = new StreamReader(ms);
-                    
-                    while (!reader.EndOfStream)
-                    {
-                        var line = reader.ReadLine();
-                        var values = line.Split(',');
-                        var anc = new Coordinate( double.Parse(values[0]), double.Parse(values[1]));
-                        list.Add(anc);
-                    }
-
-                }
-                //create a new route in db
-                _carService.AddRoute(carId, list.ToArray());
-                ////update the end position in cache
-                var carData = _carService.GetCar(carId);
-                var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.IpAddress}");
-                cached.EndPoint = list.LastOrDefault();
-                await RedisHelper.Instance.SetCache($"car_{carData.IpAddress}", cached);
-            }
-
-
-
-
-
-
-
-
-
-
-
-        }
-
-        ////STEP 5 ADD TRIGGER POINT FOR THE ROUTE
-        //public async Task AddTriggerCoordinateForRoute(string routeId, string longitude, string latitude)
-        //{
-        //    //update the route in db
-        //    _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
-        //    //update the route in cache
-        //    var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>("carId_{ip}");
-        //    cached.TriggerPoint = new Coordinate(longitude, latitude);
-
-        //}
+       
 
         ////STEP N.. TRIGGER RETURN ROUTE
         //public async Task xx()

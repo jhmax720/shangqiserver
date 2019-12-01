@@ -215,6 +215,7 @@ namespace ShangqiSocket
                                         {
                                             newCarModel.CarId = carInDb.Id;
                                             Console.WriteLine("attempt loading car from db: " + client.Client.RemoteEndPoint.ToString());
+                                            //todo load the latest route from db to cache if possible
                                         }
                                         else
                                         {                                            
@@ -233,7 +234,10 @@ namespace ShangqiSocket
                                     }
 
 
-                                    if (carInCache.IsMainVehicle)
+                                    //if (carInCache.IsMainVehicle)
+                                    //todo: FIX THIS AFTER LOCAL TEST
+                                    //assume the 2nd car is the main car
+                                    if(_cars.Count>1 && _cars[1].CarIp == carInCache.CarIp)
                                     {
                                         //update current postion
                                         carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
@@ -249,6 +253,9 @@ namespace ShangqiSocket
                                                 {
                                                     //trigger the route now
                                                     //go to auto pilot mode and send the coordinates to client
+
+                                                    Logger.Instance.Log(LogLevel.Information, $"robot {car.CarIp} is getting triggered by main car");
+
                                                     var outbound = new OutboundModel();
                                                     outbound.IpAddress = carInCache.CarIp;
                                                     outbound.Data = new List<object>();
@@ -272,6 +279,7 @@ namespace ShangqiSocket
                                                             longitude = carInCache.ImpotedCoordinates[i].Longitude
 
                                                         });
+
                                                     }
 
 
@@ -280,7 +288,7 @@ namespace ShangqiSocket
                                                     //update database with the  
 
                                                     //update cache status to action
-                                                    car.RouteStatus++;
+                                                    car.RouteStatus =2 ;
                                                     car.IsDirty = true;
                                                 }
                                             }

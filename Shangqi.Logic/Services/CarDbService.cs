@@ -127,6 +127,7 @@ namespace Shangqi.Logic.Services
             var route = new Route();
             route.ImportedCarTrack = importedCoordinates;
             route.CarId = carId;
+            route.RouteStatus = 1;
             _routes.InsertOne(route);
 
         }
@@ -141,9 +142,18 @@ namespace Shangqi.Logic.Services
         {
 
         }
-        public void UpdateRouteWithTriggerPoint(string recordId, string longtitude, string latitude)
+        public async Task UpdateRouteWithTriggerPoint(string recordId, double longtitude, double latitude)
         {
+            await _routes.FindOneAndUpdateAsync(
+                                Builders<Route>.Filter.Eq(r => r.Id, recordId),
+                                Builders<Route>.Update.Set(x => x.TriggerLatitude, latitude).Set(x => x.TriggerLongitude, longtitude)
+                                );
+        }
 
+        public List<Route> Routes(string carId)
+        {
+            var list = _routes.Find(r=>r.CarId == carId).ToList();
+            return list;
         }
 
         public async Task SyncRoute(CachedRecordingModel model)

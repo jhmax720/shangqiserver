@@ -22,9 +22,9 @@ namespace Shangqi.Logic.Data
         public int RouteStatus { get; set; }
 
         [BsonElement("longitude")]
-        public string TriggerLongitude { get; set; }
+        public double TriggerLongitude { get; set; }
 
         [BsonElement("latitude")]
-        public string TriggerLatitude { get; set; }
+        public double TriggerLatitude { get; set; }
     }
 }
