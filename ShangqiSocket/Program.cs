@@ -234,10 +234,10 @@ namespace ShangqiSocket
                                     }
 
 
-                                    //if (carInCache.IsMainVehicle)
+                                    if (carInCache.IsMainVehicle)
                                     //todo: FIX THIS AFTER LOCAL TEST
                                     //assume the 2nd car is the main car
-                                    if(_cars.Count>1 && _cars[1].CarIp == carInCache.CarIp)
+                                    //if(_cars.Count>1 && _cars[1].CarIp == carInCache.CarIp)
                                     {
                                         //update current postion
                                         carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
