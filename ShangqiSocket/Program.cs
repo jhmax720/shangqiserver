@@ -49,6 +49,7 @@ namespace ShangqiSocket
                     {
                         if(_carDirty.IsDirty)
                         {
+                            Logger.Instance.Log(LogLevel.Information, $"dirty car found, db sync {_carDirty.CarId}");
                             await _carDbService.SyncRoute(_carDirty);
                             _carDirty.IsDirty = false;
                         }
@@ -109,7 +110,7 @@ namespace ShangqiSocket
 
                                     //TODO RESET CACHED COORDINATES
 
-
+                                    Logger.Instance.Log(LogLevel.Information, $"send following command to robot: {model.IpAddress}, {jsonStr}");
 
                                     stream.Write(result, 0, result.Length);
                                     stream.Flush();
@@ -248,7 +249,8 @@ namespace ShangqiSocket
                                         {
                                             if (car.RouteStatus == 1)
                                             {
-                                                if (carInCache.TriggerPoint.IsInRange(_heartBeat.longitude,
+                                                Logger.Instance.Log(LogLevel.Information, $"calculating robot {car.CarIp} trigger point: {car.TriggerPoint.Longitude}, {car.TriggerPoint.Latitude}. Main car long:{_heartBeat.longitude}, lat: {_heartBeat.latitude}");
+                                                if (car.TriggerPoint.IsInRange(_heartBeat.longitude,
                                                     _heartBeat.latitude))
                                                 {
                                                     //trigger the route now

@@ -111,7 +111,7 @@ namespace Shangqi.Logic.Services
 
         public List<CoordinateRecord> GetCoordinateRecordsforCar(string carId)
         {
-            var list = _coordinateRecordsCollection.Find(c => c.Id == carId).SortByDescending(c => c.Id).ToList();                
+            var list = _coordinateRecordsCollection.Find(c => c.CarId == carId).SortByDescending(c => c.Id).ToList();                
             return list;
         }
 
