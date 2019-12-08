@@ -13,6 +13,8 @@ namespace Shangqi.Logic.Model
         [JsonProperty(PropertyName = "msg_count")]
         public int msg_count { get; set; }
 
+        public int robot_id { get; set; }
+
         //  robot_status 含义
         //0 待机模式
         //1 遥控器模式
