@@ -255,6 +255,8 @@ namespace ShangqiSocket
                                         //trigger other route if possible
                                         foreach (var car in _cars)
                                         {
+                                            Logger.Instance.Log(LogLevel.Information, $"checking trigger point for robot {car.CarName}");
+
                                             if (car.RouteStatus == 1)
                                             {
                                                 Logger.Instance.Log(LogLevel.Information, $"calculating robot {car.CarName} trigger point: {car.TriggerPoint.Longitude}, {car.TriggerPoint.Latitude}. Main car long:{heartBeat.longitude}, lat: {heartBeat.latitude}");
