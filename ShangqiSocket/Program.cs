@@ -94,8 +94,8 @@ namespace ShangqiSocket
                         var model = RedisHelper.Instance.GetCacheItem<OutboundModel>("command").Result;
                         if (model != null)
                         {
-                            Logger.Instance.Log(LogLevel.Information, $"sending command to robot ip: {model.IpAddress}");
-                            var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.IpAddress);
+                            Logger.Instance.Log(LogLevel.Information, $"sending command to robot ip: {model.CarName}");
+                            var client = clients.FirstOrDefault(c=>c.Client.RemoteEndPoint.ToString() == model.Ip);
                             //var client = clients.FirstOrDefault(); //todo remove this after local testing
                             if(client!=null)
                             {
@@ -110,7 +110,7 @@ namespace ShangqiSocket
 
                                     //TODO RESET CACHED COORDINATES
 
-                                    Logger.Instance.Log(LogLevel.Information, $"send following command to robot: {model.IpAddress}, {jsonStr}");
+                                    Logger.Instance.Log(LogLevel.Information, $"send following command to robot: {model.CarName}, {jsonStr}");
 
                                     stream.Write(result, 0, result.Length);
                                     stream.Flush();
@@ -182,9 +182,9 @@ namespace ShangqiSocket
                     if (num != 0)
                     {
                         string str = Encoding.UTF8.GetString(result, 0, num);//把字节数组中流存储的数据以字符串方式赋值给str
-                                                                             
-                        Console.WriteLine("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
-                        //Logger.Instance.Log("From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
+                        
+                        Logger.Instance.Log( LogLevel.Information, $"From: " + client.Client.RemoteEndPoint.ToString() + " : " + str);
+                        
 
 
                         try
@@ -193,30 +193,39 @@ namespace ShangqiSocket
                             foreach (var aRow in rows)
                             {
                                 var validatedStr = aRow.FormatValidJson();
-                                HeartBeatModel _heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(validatedStr);
-                                if (_heartBeat != null)
+                                HeartBeatModel heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(validatedStr);
+
+
+                                if (heartBeat != null)
                                 {
 
                                     //Check if the car is in cache
                                     //get cache car list
-                                    var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{client.Client.RemoteEndPoint.ToString()}").Result;
-                                    if (carInCache == null)
+                                    var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{heartBeat.robot_id}").Result;
+                                    if (carInCache == null && heartBeat.robot_id != Const.MAIN_CAR_ID)
                                     {
 
                                         
-                                        var newCarModel = _heartBeat.ToCachedRecordModel(client.Client.RemoteEndPoint.ToString());
+                                        var newCarModel = heartBeat.ToCachedRecordModel(heartBeat.robot_id);
                                         
                                         //ADD IF NOT EXIST
                                         _carDbService.AddCar(newCarModel);
 
                                         //READ FROM DB 
-                                        var carInDb = _carDbService.GetCarByIp(client.Client.RemoteEndPoint.ToString());
+                                        var carInDb = _carDbService.GetCarByName(heartBeat.robot_id);
 
                                         if(carInDb != null)
                                         {
                                             newCarModel.CarId = carInDb.Id;
-                                            Console.WriteLine("attempt loading car from db: " + client.Client.RemoteEndPoint.ToString());
-                                            //todo load the latest route from db to cache if possible
+                                            Console.WriteLine($"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
+                                            Logger.Instance.Log(LogLevel.Information, $"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
+                                            
+                                            var latestRouteIfAny = _carDbService.LatestRoute(carInDb.Id);
+                                            //ready to be triggered by main car
+                                            if(latestRouteIfAny!=null && latestRouteIfAny.RouteStatus == 1)
+                                            {
+                                                newCarModel.ImpotedCoordinates = latestRouteIfAny.ImportedCarTrack;
+                                            }
                                         }
                                         else
                                         {                                            
@@ -224,8 +233,10 @@ namespace ShangqiSocket
                                         }
                                        
                                         //add to the cache                                
-                                        RedisHelper.Instance.SetCache($"car_{client.Client.RemoteEndPoint.ToString()}", newCarModel).Wait();
+                                        RedisHelper.Instance.SetCache($"car_{carInDb.CarName}", newCarModel).Wait();
+
                                         carInCache = newCarModel;
+                                        carInCache.Ip = client.Client.RemoteEndPoint.ToString();
                                         _cars.Add(carInCache);
 
                                         RedisHelper.Instance.UpdateCurrentCarsInCache(_cars).Wait();
@@ -234,33 +245,32 @@ namespace ShangqiSocket
 
                                     }
 
-
-                                    if (_heartBeat.robot_id ==100)
-                                    //todo: FIX THIS AFTER LOCAL TEST
-                                    //assume the 2nd car is the main car
-                                    //if(_cars.Count>1 && _cars[1].CarIp == carInCache.CarIp)
+                                    //zhu che
+                                    if (heartBeat.robot_id == Const.MAIN_CAR_ID)
                                     {
                                         //update current postion
-                                        carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
+                                        //carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
                                         //add to the coordinate list
-                                        carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));
+                                        //carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));
                                         //trigger other route if possible
                                         foreach (var car in _cars)
                                         {
                                             if (car.RouteStatus == 1)
                                             {
-                                                Logger.Instance.Log(LogLevel.Information, $"calculating robot {car.CarIp} trigger point: {car.TriggerPoint.Longitude}, {car.TriggerPoint.Latitude}. Main car long:{_heartBeat.longitude}, lat: {_heartBeat.latitude}");
-                                                if (car.TriggerPoint.IsInRange(_heartBeat.longitude,
-                                                    _heartBeat.latitude))
+                                                Logger.Instance.Log(LogLevel.Information, $"calculating robot {car.CarName} trigger point: {car.TriggerPoint.Longitude}, {car.TriggerPoint.Latitude}. Main car long:{heartBeat.longitude}, lat: {heartBeat.latitude}");
+                                                if (car.TriggerPoint.IsInRange(heartBeat.longitude,
+                                                    heartBeat.latitude))
                                                 {
                                                     //trigger the route now
                                                     //go to auto pilot mode and send the coordinates to client
 
-                                                    Logger.Instance.Log(LogLevel.Information, $"robot {car.CarIp} is getting triggered by main car");
+                                                    Logger.Instance.Log(LogLevel.Information, $"robot {car.CarName} is getting triggered by main car");
 
                                                     var outbound = new OutboundModel();
-                                                    outbound.IpAddress = carInCache.CarIp;
+                                                    outbound.CarName = carInCache.CarName;
                                                     outbound.Data = new List<object>();
+                                                    outbound.Ip = carInCache.Ip;
+
                                                     //切换⾄数据传输模式
                                                     outbound.Data.Add(new msg_control_cmd()
                                                     {
@@ -298,31 +308,36 @@ namespace ShangqiSocket
 
                                     }
                                     else
-                                    {   //verify the car status in cache consitent with client
-                                        if (_heartBeat.robot_status == carInCache.RobotStatus)
+                                    {   
+                                        //fu che
+                                        //verify the car status in cache consitent with client
+                                        if (heartBeat.robot_status == carInCache.RobotStatus)
                                         {
-                                            Console.WriteLine($"synced Robot {client.Client.RemoteEndPoint.ToString()} status {_heartBeat.robot_status}");
+                                            Console.WriteLine($"synced Robot {client.Client.RemoteEndPoint.ToString()} status {heartBeat.robot_status}");
                                             //recording
                                             //// 1 == REMOTE CONTROL MODE
-                                            if (_heartBeat.robot_status == Const.ROBOT_STATUS_REMOTE)
+                                            if (heartBeat.robot_status == Const.ROBOT_STATUS_REMOTE)
                                             {
-                                                Console.WriteLine($"remote control request: update coordinate {_heartBeat.longitude}, {_heartBeat.latitude}");
+                                                Console.WriteLine($"remote control request: update coordinate {heartBeat.longitude}, {heartBeat.latitude}");
                                                 //add the coordinate to the cache
-                                                carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));
+                                                carInCache.CachedCoordinates.Add(new Coordinate(heartBeat.longitude, heartBeat.latitude));
                                             }
                                             //2 == AUTO PILOT MODE
-                                            else if (_heartBeat.robot_status == Const.ROBOT_STATUS_AUTO_PILOT)
+                                            else if (heartBeat.robot_status == Const.ROBOT_STATUS_AUTO_PILOT)
                                             {
                                                 //add the coordinates to the cache
-                                                carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));
+                                                carInCache.CachedCoordinates.Add(new Coordinate(heartBeat.longitude, heartBeat.latitude));
                                                 //update current position in cache
-                                                carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
+                                                carInCache.CurrentPosition = new Coordinate(heartBeat.longitude, heartBeat.latitude);
 
                                                 //is the current position within the endpoint?
-                                                if (carInCache.EndPoint.IsInRange(_heartBeat.longitude, _heartBeat.latitude))
+                                                if (carInCache.EndPoint.IsInRange(heartBeat.longitude, heartBeat.latitude))
                                                 {
                                                     //send to client to stop auto pilot mode
                                                     var outbound = new OutboundModel();
+
+
+
                                                     RedisHelper.Instance.SetCache("command", outbound).Wait();
                                                     //update database with the cached coordinates 
                                                     _carDbService.UpdateRouteWithCoordinates(null, carInCache.IsReturn);
@@ -386,16 +401,6 @@ namespace ShangqiSocket
 
         }
 
-        private static byte[] ObjectToByteArray(object obj)
-        {
-            if (obj == null)
-                return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
+     
     }
 }

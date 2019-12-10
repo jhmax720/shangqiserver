@@ -49,11 +49,11 @@ namespace ShangqiApi.Controllers
                 var car = _carService.GetCar(carId);
 
                 //update robot status in cache
-                var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.IpAddress}");
+                var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.CarName}");
 
                 if (carInCache == null) return BadRequest();
                 carInCache.RobotStatus = Const.ROBOT_STATUS_REMOTE;
-                await RedisHelper.Instance.SetCache($"car_{car.IpAddress}", carInCache);
+                await RedisHelper.Instance.SetCache($"car_{car.CarName}", carInCache);
 
                 //add to db
                 _carService.AddNewCarRecord(carId);
@@ -70,7 +70,7 @@ namespace ShangqiApi.Controllers
 
                 var outbound = new OutboundModel()
                 {
-                    IpAddress = carInCache.CarIp,
+                    Ip = carInCache.Ip,
                     Data = new List<object> { msg }
                 };
                 await RedisHelper.Instance.SetCache<OutboundModel>("command", outbound);
@@ -90,12 +90,12 @@ namespace ShangqiApi.Controllers
             //get car info from db
             var car = _carService.GetCar(carId);
             //save cached coordinates to database
-            var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.IpAddress}");
+            var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.CarName}");
             _carService.EndCarRecording(carId, carInCache.CachedCoordinates);
 
             //update robot status in cache
             carInCache.RobotStatus = 0;
-            await RedisHelper.Instance.SetCache($"car_{car.IpAddress}", carInCache);
+            await RedisHelper.Instance.SetCache($"car_{car.CarName}", carInCache);
 
             //send to robot to end recording
             var msg = new msg_control_cmd()
@@ -108,7 +108,7 @@ namespace ShangqiApi.Controllers
 
             var outbound = new OutboundModel()
             {
-                IpAddress = carInCache.CarIp,
+                Ip = carInCache.Ip,
                 Data = new List<object> { msg }
             };
             await RedisHelper.Instance.SetCache<OutboundModel>("command", outbound);

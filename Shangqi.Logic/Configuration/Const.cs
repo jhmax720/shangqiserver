@@ -11,7 +11,7 @@ namespace Shangqi.Logic.Configuration
         public static string DB_ROUTE = "routes";
 
         public static string CAR_COMMAND = "command";
-        public static string MAIN_CAR_IP = "todo:add hard code ip";
+        public static int MAIN_CAR_ID = 100;
 
         //遥控器模式
         public static int ROBOT_STATUS_REMOTE = 1;

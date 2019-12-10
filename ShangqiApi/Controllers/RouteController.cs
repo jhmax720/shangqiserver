@@ -53,11 +53,11 @@ namespace ShangqiApi.Controllers
                 ////update the end position in cache
                 // update the final endpoint in cache
                 var carData = _carService.GetCar(carId);
-                var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.IpAddress}");
+                var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.CarName}");
                 cached.EndPoint = list.LastOrDefault();
                 cached.ImpotedCoordinates = list.ToArray();
                 cached.RouteStatus = 1;
-                await RedisHelper.Instance.SetCache($"car_{carData.IpAddress}", cached);
+                await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
             }
 
 
@@ -98,9 +98,9 @@ namespace ShangqiApi.Controllers
 
             //update the route in cache                        
             var carData = _carService.GetCar(carId);
-            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.IpAddress}");
+            var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.CarName}");
             cached.TriggerPoint = new Coordinate(longitude, latitude);
-            await RedisHelper.Instance.SetCache($"car_{carData.IpAddress}", cached);
+            await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
 
         }
     }

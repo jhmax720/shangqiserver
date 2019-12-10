@@ -12,8 +12,8 @@ namespace Shangqi.Logic.Data
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public bool IsMainCar { get; set; }
-        public string IpAddress { get; set; }
+        public int CarName { get; set; }
+        
         public double Battery { get; set; }
 
         //[BsonElement("Status")]

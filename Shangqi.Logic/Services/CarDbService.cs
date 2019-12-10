@@ -43,7 +43,7 @@ namespace Shangqi.Logic.Services
         public IList<RegisteredCarData> List()
         {
 
-            var list = _cars.Find(car => !car.IsMainCar).ToList();
+            var list = _cars.Find(car => car.Id !=null).ToList();
             return list;
         }
 
@@ -52,9 +52,9 @@ namespace Shangqi.Logic.Services
             return _cars.Find(car => car.Id == carId).FirstOrDefault();
         }
 
-        public RegisteredCarData GetCarByIp(string carIp)
+        public RegisteredCarData GetCarByName(int carName)
         {
-            return _cars.Find(car => car.IpAddress == carIp).FirstOrDefault();
+            return _cars.Find(car => car.CarName == carName).FirstOrDefault();
         }
 
         public void AddCar(CachedRecordingModel model)
@@ -62,9 +62,9 @@ namespace Shangqi.Logic.Services
             var dbCar = new RegisteredCarData
             {
                 Battery = model.Battery,
-                IpAddress = model.CarIp
+                CarName = model.CarName
             };
-            var count = _cars.Find<RegisteredCarData>(Builders<RegisteredCarData>.Filter.Eq(r => r.IpAddress, model.CarIp)).CountDocuments();
+            var count = _cars.Find<RegisteredCarData>(Builders<RegisteredCarData>.Filter.Eq(r => r.CarName, model.CarName)).CountDocuments();
             if (count == 0)
             {
                 _cars.InsertOne(dbCar);
@@ -128,6 +128,8 @@ namespace Shangqi.Logic.Services
             route.ImportedCarTrack = importedCoordinates;
             route.CarId = carId;
             route.RouteStatus = 1;
+            route.Created = DateTime.Now;
+
             _routes.InsertOne(route);
 
         }
@@ -154,6 +156,13 @@ namespace Shangqi.Logic.Services
         {
             var list = _routes.Find(r=>r.CarId == carId).ToList();
             return list;
+        }
+
+        public Route LatestRoute(string carId)
+        {
+            var route = _routes.Find(r => r.CarId == carId).SortByDescending(r => r.Created).FirstOrDefault();
+
+            return route;
         }
 
         public async Task SyncRoute(CachedRecordingModel model)

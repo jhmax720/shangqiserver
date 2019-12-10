@@ -18,8 +18,12 @@ namespace Shangqi.Logic.Model
 
     public class CachedRecordingModel
     {
-        public string CarIp { get; set; }
         public string CarId { get; set; }
+        public string Ip { get; set; }
+
+        //main car 100
+        //e.g. 100, 101, 102
+        public int CarName { get; set; } 
         public bool IsReturn { get; set; }
 
         //0 default
@@ -42,7 +46,7 @@ namespace Shangqi.Logic.Model
         public IList<Coordinate> ImpotedCoordinates { get; set; }
         public bool IsMainVehicle {
             get {
-                return this.CarIp == Const.MAIN_CAR_IP;
+                return this.CarName == Const.MAIN_CAR_ID;
             }
         }
 
