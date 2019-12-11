@@ -16,5 +16,7 @@ namespace Shangqi.Logic.Configuration
         //遥控器模式
         public static int ROBOT_STATUS_REMOTE = 1;
         public static int ROBOT_STATUS_AUTO_PILOT = 2;
+
+        public static string ROBOT_INDEX = "robot_index";
     }
 }

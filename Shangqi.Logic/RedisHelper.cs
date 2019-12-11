@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Options;
+using Shangqi.Logic.Configuration;
 using Shangqi.Logic.Model;
 using StackExchange.Redis;
 
@@ -13,12 +15,12 @@ namespace Shangqi.Logic
     public class RedisHelper
     {
         private IDistributedCache _cache;
-        public List<int> CarNameIndexList { get; }
+        
 
         private RedisHelper()
         {
             _cache = new RedisCache(new MyRedisOptions());
-            CarNameIndexList = new List<int>();
+            
 
         }
 
@@ -41,8 +43,9 @@ namespace Shangqi.Logic
         {
 
             IList<CachedRecordingModel> _list = new List<CachedRecordingModel>();
+            var iL = GetCachedNameIndex();
 
-            foreach (var i in CarNameIndexList)
+            foreach (var i in iL)
             {
                 var model = await _cache.GetAsync<CachedRecordingModel>($"car_{i}");
                 if (model != null)
@@ -55,6 +58,29 @@ namespace Shangqi.Logic
             return _list;
         }
 
+
+        public int[] GetCachedNameIndex()
+        {
+            var str = _cache.GetString(Const.ROBOT_INDEX);
+            if (str != null)
+            {
+                var split = str.Split(";").Where(x=>!string.IsNullOrEmpty(x));
+                return split.Select(int.Parse).Distinct().ToArray();
+            }
+
+            return new int[0];
+
+        }
+
+        public void AddCachedNameIndex(int carName)
+        {
+            var str = _cache.GetString(Const.ROBOT_INDEX);
+            if (str == null) str = string.Empty;
+            str +=  carName + ";";
+
+            _cache.SetString(Const.ROBOT_INDEX, str);
+
+        }
 
         public async Task SetCache<T>(string key, T model) where T : class, new()
         {

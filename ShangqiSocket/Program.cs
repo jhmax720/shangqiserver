@@ -324,7 +324,7 @@ namespace ShangqiSocket
                                             carInCache = newCarModel;
                                             
 
-                                            RedisHelper.Instance.CarNameIndexList.Add(carInCache.CarName);
+                                            RedisHelper.Instance.AddCachedNameIndex(carInCache.CarName);
                                             RedisHelper.Instance.SetCache($"car_{carInDb.CarName}", carInCache).Wait();
 
                                             Logger.Instance.Log(LogLevel.Information, "new robot added successfully " + client.Client.RemoteEndPoint.ToString());
