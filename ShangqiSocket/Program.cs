@@ -177,7 +177,16 @@ namespace ShangqiSocket
                 while (true)
                 {
                     byte[] result = new byte[1024];
-                    int num = stream.Read(result, 0, result.Length); //将数据读到result中，并返回字符长度                  
+                    int num = 0;
+                    try
+                    {
+                        num = stream.Read(result, 0, result.Length); //将数据读到result中，并返回字符长度                  
+                    }
+                    catch (IOException ex)
+                    {
+                        Logger.Instance.Log(LogLevel.Warning, $"IO exception detected, client {client.Client.RemoteEndPoint.ToString()} might be disconnected");
+                    }
+                    
                     if (num != 0)
                     {
                         string str = Encoding.UTF8.GetString(result, 0, num);//把字节数组中流存储的数据以字符串方式赋值给str
