@@ -26,11 +26,11 @@ namespace Shangqi.Logic
             return sb.ToString();
         }
 
-        public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source, int carName)
+        public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source)
         {
             var coo = new Coordinate(source.longitude, source.latitude);
             var cachedCachedRecordingModel = new CachedRecordingModel {
-                CarName = carName,
+                CarName = source.robot_id,
                 CurrentPosition = coo                
 
             };

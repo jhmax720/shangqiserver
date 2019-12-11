@@ -282,10 +282,10 @@ namespace ShangqiSocket
                                         {
 
 
-                                            var newCarModel = heartBeat.ToCachedRecordModel(heartBeat.robot_id);
+                                            var newCarModel = heartBeat.ToCachedRecordModel();
 
                                             //ADD IF NOT EXIST
-                                            _carDbService.AddCar(newCarModel);
+                                            _carDbService.AddCarIfNotExist(newCarModel);
 
                                             //READ FROM DB 
                                             var carInDb = _carDbService.GetCarByName(heartBeat.robot_id);
@@ -293,8 +293,9 @@ namespace ShangqiSocket
                                             if (carInDb != null)
                                             {
                                                 newCarModel.CarId = carInDb.Id;
+                                                newCarModel.Ip = client.Client.RemoteEndPoint.ToString();
                                                 //Console.WriteLine($"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
-                                                Logger.Instance.Log(LogLevel.Information, $"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
+                                                Logger.Instance.Log(LogLevel.Information, $"attempt loading car from db: {newCarModel.CarName}, {client.Client.RemoteEndPoint.ToString()}");
 
                                                 var latestRouteIfAny = _carDbService.LatestRoute(carInDb.Id);
                                                 //ready to be triggered by main car
@@ -312,7 +313,7 @@ namespace ShangqiSocket
 
 
                                             carInCache = newCarModel;
-                                            carInCache.Ip = client.Client.RemoteEndPoint.ToString();
+                                            
 
                                             RedisHelper.Instance.CarNameIndexList.Add(carInCache.CarName);
                                             RedisHelper.Instance.SetCache($"car_{carInDb.CarName}", carInCache).Wait();

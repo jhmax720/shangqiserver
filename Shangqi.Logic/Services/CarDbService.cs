@@ -57,7 +57,7 @@ namespace Shangqi.Logic.Services
             return _cars.Find(car => car.CarName == carName).FirstOrDefault();
         }
 
-        public void AddCar(CachedRecordingModel model)
+        public void AddCarIfNotExist(CachedRecordingModel model)
         {
             var dbCar = new RegisteredCarData
             {

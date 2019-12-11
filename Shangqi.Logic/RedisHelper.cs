@@ -18,6 +18,8 @@ namespace Shangqi.Logic
         private RedisHelper()
         {
             _cache = new RedisCache(new MyRedisOptions());
+            CarNameIndexList = new List<int>();
+
         }
 
         
