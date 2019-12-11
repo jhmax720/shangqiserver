@@ -6,17 +6,22 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Options;
 using Shangqi.Logic.Model;
+using StackExchange.Redis;
 
 namespace Shangqi.Logic
 {
     public class RedisHelper
     {
         private IDistributedCache _cache;
-        
+        public List<int> CarNameIndexList { get; }
+
         private RedisHelper()
         {
-            _cache = new RedisCache(new MyRedisOptions());            
+            _cache = new RedisCache(new MyRedisOptions());
         }
+
+        
+
         private static RedisHelper _instance = null;
         public static RedisHelper Instance
         {
@@ -30,17 +35,24 @@ namespace Shangqi.Logic
             }
         }
 
-        public async Task<List<CachedRecordingModel>> GetCurrentCarsInCache()
+        public async Task<IList<CachedRecordingModel>> GetCurrentCarsInCache()
         {
 
-            var l =await _cache.GetAsync<List<CachedRecordingModel>>("AllRobots");
-            return l;
+            IList<CachedRecordingModel> _list = new List<CachedRecordingModel>();
+
+            foreach (var i in CarNameIndexList)
+            {
+                var model = await _cache.GetAsync<CachedRecordingModel>($"car_{i}");
+                if (model != null)
+                {
+                    _list.Add(model);
+                }
+            }
+            
+
+            return _list;
         }
 
-        public async Task UpdateCurrentCarsInCache(List<CachedRecordingModel> list)
-        {
-            await _cache.SetAsync<List<CachedRecordingModel>>("AllRobots", list, new DistributedCacheEntryOptions());
-        }
 
         public async Task SetCache<T>(string key, T model) where T : class, new()
         {

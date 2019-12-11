@@ -36,7 +36,7 @@ namespace ShangqiApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            services.AddCors();
             services.Configure<DBSettings>(
                 Configuration.GetSection(nameof(DBSettings)));
 

@@ -48,7 +48,7 @@ namespace ShangqiSocketClient
                     //clientSocket.Send(sendBytes);
 
                     //Scenaria 2 Test bad payload
-                    var sendStr2 = @"{""robot_id"":" + robotId + @", ""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude + @", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": " + robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": " + latitude + "}";
+                    var sendStr2 = @"{""robot_id"":" + robotId + @", ""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude + @", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": " + robotStatus + @", ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": " + latitude + "}";
                     ///var sendStr3 = @"{""type"": ""heart"", ""check"": 0, ""longitude"": " + longitude + @", ""msg_count"": 2675, ""route_id"": 0, ""robot_status"": " + robotStatus + @", ""robot_id"": 102, ""battery"": 0, ""error"": 0, ""rtk_qual"": 0, ""route_status"": 0, ""latitude"": " + latitude + "}";
 
                     byte[] sendBytes2 = Encoding.ASCII.GetBytes(sendStr2);
