@@ -363,6 +363,10 @@ namespace ShangqiSocket
                                         if (heartBeat.robot_status == carInCache.RobotStatus)
                                         {
                                             Console.WriteLine($"synced Robot {client.Client.RemoteEndPoint.ToString()} status {heartBeat.robot_status}");
+                                            //update current position in cache
+                                            carInCache.CurrentPosition = new Coordinate(heartBeat.longitude, heartBeat.latitude);
+                                            carInCache.Speed = heartBeat.speed;
+                                            carInCache.Battery = heartBeat.battery;
 
                                             //recording
                                             //// 1 == REMOTE CONTROL MODE
@@ -371,15 +375,14 @@ namespace ShangqiSocket
                                                 Console.WriteLine($"remote control request: update coordinate {heartBeat.longitude}, {heartBeat.latitude}");
                                                 //add the coordinate to the cache
                                                 carInCache.CachedCoordinates.Add(new Coordinate(heartBeat.longitude, heartBeat.latitude));
-                                                carInCache.CurrentPosition = new Coordinate(heartBeat.longitude, heartBeat.latitude);
+                                                
                                             }
                                             //2 == AUTO PILOT MODE
                                             else if (heartBeat.robot_status == Const.ROBOT_STATUS_AUTO_PILOT)
                                             {
                                                 //add the coordinates to the cache
                                                 carInCache.CachedCoordinates.Add(new Coordinate(heartBeat.longitude, heartBeat.latitude));
-                                                //update current position in cache
-                                                carInCache.CurrentPosition = new Coordinate(heartBeat.longitude, heartBeat.latitude);
+                                                
 
                                                 //is the current position within the endpoint?
                                                 if (carInCache.EndPoint.IsInRange(heartBeat.longitude, heartBeat.latitude))

@@ -27,12 +27,9 @@ namespace Shangqi.Logic
         }
 
         public static CachedRecordingModel ToCachedRecordModel(this HeartBeatModel source)
-        {
-            var coo = new Coordinate(source.longitude, source.latitude);
+        {            
             var cachedCachedRecordingModel = new CachedRecordingModel {
-                CarName = source.robot_id,
-                CurrentPosition = coo                
-
+                CarName = source.robot_id,                
             };
             return cachedCachedRecordingModel;
         }

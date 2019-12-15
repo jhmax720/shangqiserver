@@ -37,6 +37,7 @@ namespace Shangqi.Logic.Model
         public int RobotStatus { get; set; }
 
         public double Battery { get; set; }
+        public double Speed { get; set; }
 
         public Coordinate TriggerPoint { get; set; }
 
