@@ -213,6 +213,7 @@ namespace ShangqiSocket
                                     if (heartBeat.robot_id == Const.MAIN_CAR_ID)
                                     {
                                         //update current postion
+                                        RedisHelper.Instance.SetCache<HeartBeatModel>("main", heartBeat).Wait();
                                         //carInCache.CurrentPosition = new Coordinate(_heartBeat.longitude, _heartBeat.latitude);
                                         //add to the coordinate list
                                         //carInCache.CachedCoordinates.Add(new Coordinate(_heartBeat.longitude, _heartBeat.latitude));

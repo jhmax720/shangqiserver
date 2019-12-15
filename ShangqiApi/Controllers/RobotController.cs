@@ -39,6 +39,14 @@ namespace ShangqiApi.Controllers
             return l;
         }
 
+        [HttpGet("cache/main")]
+        [Produces("application/json")]
+        public async Task<HeartBeatModel> GetMainCar()
+        {
+            
+            return await RedisHelper.Instance.GetCacheItem<HeartBeatModel>("main");
+        }
+
         [HttpPost("control")]
         [Produces("application/json")]
         public async Task<IActionResult> Control(int control, string carId)
