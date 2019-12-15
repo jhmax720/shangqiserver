@@ -65,6 +65,7 @@ namespace ShangqiApi.Controllers
                         check = 8,
                         speed = 2.1
                     });
+                    await RedisHelper.Instance.SetCache("command", outbound);
                     return Ok();
                 //遥控
                 case 2:
@@ -76,6 +77,7 @@ namespace ShangqiApi.Controllers
                         check = 8,
                         speed = 2.1
                     });
+                    await RedisHelper.Instance.SetCache("command", outbound);
                     return Ok();
                 //测绘
                 case 3:
@@ -87,7 +89,7 @@ namespace ShangqiApi.Controllers
                         check = 8,
                         speed = 2.1
                     });
-
+                    await RedisHelper.Instance.SetCache("command", outbound);
                     return Ok();
                 //循迹驾驶
                 case 4:
@@ -99,6 +101,7 @@ namespace ShangqiApi.Controllers
                         check = 8,
                         speed = 2.1
                     });
+                    await RedisHelper.Instance.SetCache("command", outbound);
                     return Ok();
 
 
