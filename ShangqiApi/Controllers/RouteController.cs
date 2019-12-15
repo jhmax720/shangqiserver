@@ -22,6 +22,7 @@ namespace ShangqiApi.Controllers
         }
 
         [HttpPost("import")]
+        [Produces("application/json")]
         ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
         public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false)
         {
@@ -82,7 +83,8 @@ namespace ShangqiApi.Controllers
         /// <param name="latitude"></param>
         /// <returns></returns>
         /// 
-        [HttpGet("ids")]
+        [HttpGet("items")]
+        [Produces("application/json")]
         public List<Route> GetRouteIds(string carId)
         {
             var routes = _carService.Routes(carId);
@@ -91,6 +93,7 @@ namespace ShangqiApi.Controllers
 
 
         [HttpPost("triggerpoint")]
+        [Produces("application/json")]
         public async Task AddTriggerCoordinateForRoute(string carId, string routeId, double longitude, double latitude)
         {
             //update the route in db

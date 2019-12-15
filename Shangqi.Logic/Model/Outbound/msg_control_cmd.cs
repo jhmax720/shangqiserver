@@ -15,10 +15,10 @@ namespace Shangqi.Logic.Model.Outbound
         }
         
         public int msg_count { get; set; }
-        public string cmd { get; set; }
-        public string cmd_slave { get; set; }
-        public string route_id { get; set; }
+        public int cmd { get; set; }
+        public int cmd_slave { get; set; }
+        public int route_id { get; set; }
         public double speed { get; set; }
-        public string check { get; set; }
+        public int check { get; set; }
     }
 }

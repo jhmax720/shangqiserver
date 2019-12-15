@@ -242,10 +242,22 @@ namespace ShangqiSocket
                                                     //切换⾄数据传输模式
                                                     outbound.Data.Add(new msg_control_cmd()
                                                     {
-                                                        cmd = "1",
-                                                        cmd_slave = "3",
-                                                        route_id = "x"
+                                                        cmd = 1,
+                                                        cmd_slave = 3,
+                                                        route_id = 0
                                                     });
+
+                                                    //循迹驾驶
+                                                    outbound.Data.Add(new msg_control_cmd()
+                                                    {
+                                                        cmd = 1,
+                                                        cmd_slave = 1,
+                                                        route_id = 0,
+                                                        check = 8,
+                                                        speed = 2.1
+                                                    });
+
+                                                    //
                                                     //路径点与传输：
 
                                                     var msg_total = cachedModel.ImpotedCoordinates.Count;
@@ -350,6 +362,7 @@ namespace ShangqiSocket
                                         if (heartBeat.robot_status == carInCache.RobotStatus)
                                         {
                                             Console.WriteLine($"synced Robot {client.Client.RemoteEndPoint.ToString()} status {heartBeat.robot_status}");
+
                                             //recording
                                             //// 1 == REMOTE CONTROL MODE
                                             if (heartBeat.robot_status == Const.ROBOT_STATUS_REMOTE)
@@ -357,6 +370,7 @@ namespace ShangqiSocket
                                                 Console.WriteLine($"remote control request: update coordinate {heartBeat.longitude}, {heartBeat.latitude}");
                                                 //add the coordinate to the cache
                                                 carInCache.CachedCoordinates.Add(new Coordinate(heartBeat.longitude, heartBeat.latitude));
+                                                carInCache.CurrentPosition = new Coordinate(heartBeat.longitude, heartBeat.latitude);
                                             }
                                             //2 == AUTO PILOT MODE
                                             else if (heartBeat.robot_status == Const.ROBOT_STATUS_AUTO_PILOT)
@@ -370,7 +384,7 @@ namespace ShangqiSocket
                                                 if (carInCache.EndPoint.IsInRange(heartBeat.longitude, heartBeat.latitude))
                                                 {
                                                     //send to client to stop auto pilot mode
-                                                    var outbound = new OutboundModel();
+                                                    var outbound = new OutboundModel( carInCache.Ip, carInCache.CarName);
 
 
 
@@ -380,16 +394,16 @@ namespace ShangqiSocket
                                                     //update cache status to idle
                                                     carInCache.RouteStatus++;
                                                     //end of the process
-                                                    if (carInCache.RouteStatus == 4)
-                                                    {
-                                                        RedisHelper.Instance.ClearKey("car_{ip}");
+                                                    //if (carInCache.RouteStatus == 4)
+                                                    //{
+                                                    //    RedisHelper.Instance.ClearKey("car_{ip}");
 
-                                                    }
+                                                    //}
                                                 }
                                             }
 
                                             //update cache
-                                            RedisHelper.Instance.SetCache($"car_{client.Client.RemoteEndPoint.ToString()}", carInCache).Wait();
+                                            RedisHelper.Instance.SetCache($"car_{carInCache.CarName}", carInCache).Wait();
                                         }
 
 
