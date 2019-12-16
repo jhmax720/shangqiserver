@@ -7,6 +7,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Shangqi.Logic.Model
 {
+    [Serializable()]
     [DataContract]
     public class HeartBeatModel
     {
