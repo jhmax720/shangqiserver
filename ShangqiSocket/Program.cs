@@ -202,7 +202,7 @@ namespace ShangqiSocket
                             {
                                 var validatedStr = aRow.FormatValidJson();
                                 HeartBeatModel heartBeat = JsonConvert.DeserializeObject<HeartBeatModel>(validatedStr);
-
+                                if (heartBeat.robot_id == 0) continue;
 
                                 if (heartBeat != null)
                                 {
@@ -258,22 +258,7 @@ namespace ShangqiSocket
                                                         speed = 2.1
                                                     });
 
-                                                    //
-                                                    //路径点与传输：
-
-                                                    var msg_total = cachedModel.ImpotedCoordinates.Count;
-                                                    for (int i = 0; i < msg_total; i++)
-                                                    {
-                                                        outbound.Data.Add(new msg_map_route
-                                                        {
-                                                            msg_total = msg_total,
-                                                            msg_count = i + 1, //it starts with 1
-                                                            latitude = cachedModel.ImpotedCoordinates[i].Latitude,
-                                                            longitude = cachedModel.ImpotedCoordinates[i].Longitude
-
-                                                        });
-
-                                                    }
+                                                 
 
 
 

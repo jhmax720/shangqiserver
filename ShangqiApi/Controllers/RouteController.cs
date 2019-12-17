@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shangqi.Logic;
 using Shangqi.Logic.Data;
 using Shangqi.Logic.Model;
+using Shangqi.Logic.Model.Outbound;
 using Shangqi.Logic.Services;
 
 namespace ShangqiApi.Controllers
@@ -59,6 +60,28 @@ namespace ShangqiApi.Controllers
                 cached.ImpotedCoordinates = list.ToArray();
                 cached.RouteStatus = 1;
                 await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
+
+
+                //send command to robot
+                //路径点与传输：
+                var outbound = new OutboundModel();
+                outbound.CarName = outbound.CarName;
+                outbound.Data = new List<object>();
+                outbound.Ip = outbound.Ip;
+                var msg_total = cached.ImpotedCoordinates.Count;
+                for (int i = 0; i < msg_total; i++)
+                {
+                    outbound.Data.Add(new msg_map_route
+                    {
+                        msg_total = msg_total,
+                        msg_count = i + 1, //it starts with 1
+                        latitude = cached.ImpotedCoordinates[i].Latitude,
+                        longitude = cached.ImpotedCoordinates[i].Longitude
+
+                    });
+
+                }
+                RedisHelper.Instance.SetCache("command", outbound).Wait();
             }
 
 
