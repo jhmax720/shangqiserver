@@ -285,64 +285,68 @@ namespace ShangqiSocket
                                         //Check if the car is in cache
                                         //get cache car list
                                         var carInCache = RedisHelper.Instance.TryGetFromCarList($"car_{heartBeat.robot_id}").Result;
+                                        
+                                        var updateCache = false;
+
                                         if (carInCache == null)
                                         {
+                                            //new robot registers
 
+                                            carInCache = heartBeat.ToCachedRecordModel();
 
-                                            var newCarModel = heartBeat.ToCachedRecordModel();
-
-                                            //ADD IF NOT EXIST
-                                            _carDbService.AddCarIfNotExist(newCarModel);
+                                            //ADD TO DB IF NOT EXIST
+                                            _carDbService.AddCarIfNotExist(carInCache);
 
                                             //READ FROM DB 
                                             var carInDb = _carDbService.GetCarByName(heartBeat.robot_id);
 
-                                            if (carInDb != null)
-                                            {
-                                                newCarModel.CarId = carInDb.Id;
-                                                newCarModel.Ip = client.Client.RemoteEndPoint.ToString();
-                                                //Console.WriteLine($"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
-                                                Logger.Instance.Log(LogLevel.Information, $"attempt loading car from db: {newCarModel.CarName}, {client.Client.RemoteEndPoint.ToString()}");
+                                            carInCache.CarId = carInDb.Id;
+                                            carInCache.Ip = client.Client.RemoteEndPoint.ToString();
+                                            //Console.WriteLine($"attempt loading car from db: {carInDb.CarName}, {client.Client.RemoteEndPoint.ToString()}");
+                                            Logger.Instance.Log(LogLevel.Information, $"attempt loading car from db: {carInCache.CarName}, {client.Client.RemoteEndPoint.ToString()}");
 
-                                                var latestRouteIfAny = _carDbService.LatestRoute(carInDb.Id);
-                                                //ready to be triggered by main car
-                                                if (latestRouteIfAny != null && latestRouteIfAny.RouteStatus == 1)
-                                                {
-                                                    newCarModel.ImpotedCoordinates = latestRouteIfAny.ImportedCarTrack;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                //throw err?
-                                            }
+                                            updateCache = true;
 
                                             //add to the cache                                
 
-
-                                            carInCache = newCarModel;
-                                            
-
                                             RedisHelper.Instance.AddCachedNameIndex(carInCache.CarName);
-                                            RedisHelper.Instance.SetCache($"car_{carInDb.CarName}", carInCache).Wait();
 
                                             Logger.Instance.Log(LogLevel.Information, "new robot added successfully " + client.Client.RemoteEndPoint.ToString());
 
                                         }
                                         else
                                         {
-                                            ///Ip will change randomly
+                                            ///Ip will change randomly upon reconnect
                                             Logger.Instance.Log(LogLevel.Information, $"loaded robot '{heartBeat.robot_id}' successfully from cache:" + client.Client.RemoteEndPoint.ToString());
 
                                             if(carInCache.Ip != client.Client.RemoteEndPoint.ToString())
                                             {
                                                 carInCache.Ip = client.Client.RemoteEndPoint.ToString();
-                                                RedisHelper.Instance.SetCache($"car_{carInCache.CarName}", carInCache).Wait();
+                                                updateCache = true;
 
                                             }
 
 
                                         }
 
+                                        if(updateCache)
+                                        {
+                                            var carInDb = _carDbService.GetCarByName(heartBeat.robot_id);
+
+                                            var latestRouteIfAny = _carDbService.LatestRoute(carInDb.Id);
+                                            //ready to be triggered by main car
+                                            if (latestRouteIfAny != null && latestRouteIfAny.RouteStatus == 1)
+                                            {
+                                                carInCache.ImpotedCoordinates = latestRouteIfAny.ImportedCarTrack;
+                                                carInCache.RouteId = latestRouteIfAny.Id;
+                                                carInCache.RouteStatus = latestRouteIfAny.RouteStatus;
+                                            }
+
+                                            RedisHelper.Instance.SetCache($"car_{carInCache.CarName}", carInCache).Wait();
+                                        }
+                                        
+
+                                        
                                         //fu che
                                         //verify the car status in cache consitent with client
                                         if (heartBeat.robot_status == carInCache.RobotStatus)

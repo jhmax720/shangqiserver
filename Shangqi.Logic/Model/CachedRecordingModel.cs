@@ -34,6 +34,7 @@ namespace Shangqi.Logic.Model
         //5 return route triggered manually
         //6 return route completed
         public int RouteStatus { get; set; }
+        public string RouteId { get; set; }
         public int RobotStatus { get; set; }
 
         public double Battery { get; set; }

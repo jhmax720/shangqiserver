@@ -170,15 +170,15 @@ namespace Shangqi.Logic.Services
             if(model.RouteStatus == 2)
             {
                 var result = await _routes.FindOneAndUpdateAsync(
-                                Builders<Route>.Filter.Eq(r => r.CarId, model.CarId),
-                                Builders<Route>.Update.Set(x => x.CarTrack, model.CachedCoordinates).Set(x => x.RouteStatus, model.RouteStatus)
+                                Builders<Route>.Filter.Eq(r => r.Id, model.RouteId),
+                                Builders<Route>.Update.Set(x => x.CarTrack, model.CachedCoordinates.ToArray()).Set(x => x.RouteStatus, model.RouteStatus)
                                 );
             }
             else
             {
                 var result = await _routes.FindOneAndUpdateAsync(
-                                Builders<Route>.Filter.Eq(r => r.CarId, model.CarId),
-                                Builders<Route>.Update.Set(x => x.CarTrackReturn, model.CachedCoordinates).Set(x=>x.RouteStatus, model.RouteStatus)
+                                Builders<Route>.Filter.Eq(r => r.Id, model.RouteId),
+                                Builders<Route>.Update.Set(x => x.CarTrackReturn, model.CachedCoordinates.ToArray()).Set(x=>x.RouteStatus, model.RouteStatus)
                                 );
             }
 

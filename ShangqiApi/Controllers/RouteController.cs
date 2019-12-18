@@ -65,9 +65,9 @@ namespace ShangqiApi.Controllers
                 //send command to robot
                 //路径点与传输：
                 var outbound = new OutboundModel();
-                outbound.CarName = outbound.CarName;
+                outbound.CarName = cached.CarName;
                 outbound.Data = new List<object>();
-                outbound.Ip = outbound.Ip;
+                outbound.Ip = cached.Ip;
                 var msg_total = cached.ImpotedCoordinates.Count;
                 for (int i = 0; i < msg_total; i++)
                 {
