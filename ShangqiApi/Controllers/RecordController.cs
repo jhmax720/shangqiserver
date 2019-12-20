@@ -89,6 +89,7 @@ namespace ShangqiApi.Controllers
 
             //update robot status in cache
             carInCache.RobotStatus = 0;
+            carInCache.CachedCoordinates = new List<Coordinate>();
             await RedisHelper.Instance.SetCache($"car_{car.CarName}", carInCache);
 
             //send to robot to end recording
@@ -133,7 +134,7 @@ namespace ShangqiApi.Controllers
 
             foreach (var coordinate in coordinateRecord.Coordinates)
             {
-                sb.AppendLine($"{coordinate.Latitude}, {coordinate.Longitude}");
+                sb.AppendLine($"{coordinate.Longitude}, {coordinate.Latitude}");
             }
 
 
