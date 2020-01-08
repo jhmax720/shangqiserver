@@ -49,10 +49,10 @@ namespace ShangqiApi.Controllers
 
         [HttpPost("control")]
         [Produces("application/json")]
-        public async Task<IActionResult> Control(int control, string carId)
+        public async Task<IActionResult> Control(int control, int carName)
         {
             
-            var carInDb = _carService.GetCar(carId);
+            var carInDb = _carService.GetCarByName(carName);
             var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carInDb.CarName}");
 
             if (carInCache == null)

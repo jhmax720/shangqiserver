@@ -47,7 +47,7 @@ namespace Shangqi.Logic.Services
             return list;
         }
 
-        public RegisteredCarData GetCar(string carId)
+        private RegisteredCarData GetCar(string carId)
         {
             return _cars.Find(car => car.Id == carId).FirstOrDefault();
         }

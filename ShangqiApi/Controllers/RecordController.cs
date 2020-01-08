@@ -32,13 +32,13 @@ namespace ShangqiApi.Controllers
         [HttpPost("recording/start")]
         [Produces("application/json")]
         //STEP 1 START RECORDING CAR COORDINATES
-        public async Task<ActionResult> StartCoordinateRecording(string carId, string recordId)
+        public async Task<ActionResult> StartCoordinateRecording(int carName, string recordId)
         {
 
             if (recordId == null)
             {
                 //get car info from db
-                var car = _carService.GetCar(carId);
+                var car = _carService.GetCarByName(carName);
 
                 //update robot status in cache
                 var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.CarName}");
@@ -48,7 +48,7 @@ namespace ShangqiApi.Controllers
                 await RedisHelper.Instance.SetCache($"car_{car.CarName}", carInCache);
 
                 //add to db
-                _carService.AddNewCarRecord(carId);
+                _carService.AddNewCarRecord(car.Id);
 
 
                 //send to robot to start recording
@@ -79,13 +79,13 @@ namespace ShangqiApi.Controllers
         [HttpPost("recording/end")]
         [Produces("application/json")]
         //STEP 2 END RECORDING AND SAVE DATA FROM CACHE
-        public async Task<ActionResult> EndCarRecord(string carId)
+        public async Task<ActionResult> EndCarRecord(int carName)
         {
             //get car info from db
-            var car = _carService.GetCar(carId);
+            var car = _carService.GetCarByName(carName);
             //save cached coordinates to database
             var carInCache = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{car.CarName}");
-            _carService.EndCarRecording(carId, carInCache.CachedCoordinates);
+            _carService.EndCarRecording(car.Id, carInCache.CachedCoordinates);
 
             //update robot status in cache
             carInCache.RobotStatus = 0;

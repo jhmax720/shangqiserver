@@ -25,7 +25,7 @@ namespace ShangqiApi.Controllers
         [HttpPost("import")]
         [Produces("application/json")]
         ////STEP 4 IMPORT THE COORDINATES FROM CSV AND GENERATE ROUTE 
-        public async Task ImportCoordinatesCreateRoute(string carId, bool isReturn = false)
+        public async Task ImportCoordinatesCreateRoute(int carName, bool isReturn = false)
         {
             //get the coordinates from uploaded CSV
 
@@ -50,17 +50,18 @@ namespace ShangqiApi.Controllers
                     }
 
                 }
-                //create a new route in db
-                _carService.AddRoute(carId, list.ToArray());
+                
                 ////update the end position in cache
                 // update the final endpoint in cache
-                var carData = _carService.GetCar(carId);
+                var carData = _carService.GetCarByName(carName);
                 var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.CarName}");
                 cached.EndPoint = list.LastOrDefault();
                 cached.ImpotedCoordinates = list.ToArray();
                 cached.RouteStatus = 1;
                 await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
 
+                //create a new route in db
+                _carService.AddRoute(carData.Id, list.ToArray());
 
                 //send command to robot
                 //路径点与传输：
@@ -117,13 +118,13 @@ namespace ShangqiApi.Controllers
 
         [HttpPost("triggerpoint")]
         [Produces("application/json")]
-        public async Task AddTriggerCoordinateForRoute(string carId, string routeId, double longitude, double latitude)
+        public async Task AddTriggerCoordinateForRoute(int carName, string routeId, double longitude, double latitude)
         {
             //update the route in db
             await _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
 
             //update the route in cache                        
-            var carData = _carService.GetCar(carId);
+            var carData = _carService.GetCarByName(carName);
             var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.CarName}");
             cached.TriggerPoint = new Coordinate(longitude, latitude);
             await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
