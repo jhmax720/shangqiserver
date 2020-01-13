@@ -144,11 +144,14 @@ namespace Shangqi.Logic.Services
         {
 
         }
-        public async Task UpdateRouteWithTriggerPoint(string recordId, double longtitude, double latitude)
+        public async Task UpdateRouteWithTriggerPoint(string recordId, double longtitude, double latitude, double speed)
         {
             await _routes.FindOneAndUpdateAsync(
                                 Builders<Route>.Filter.Eq(r => r.Id, recordId),
-                                Builders<Route>.Update.Set(x => x.TriggerLatitude, latitude).Set(x => x.TriggerLongitude, longtitude)
+                                Builders<Route>.Update
+                                    .Set(x => x.TriggerLatitude, latitude)
+                                    .Set(x => x.TriggerLongitude, longtitude)
+                                    .Set(x=>x.StartingSpeed, speed)
                                 );
         }
 

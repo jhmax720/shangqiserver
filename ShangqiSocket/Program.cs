@@ -255,7 +255,7 @@ namespace ShangqiSocket
                                                         cmd_slave = 1,
                                                         route_id = 0,
                                                         check = 8,
-                                                        speed = 2.1
+                                                        speed = cachedModel.Speed
                                                     });
 
                                                  

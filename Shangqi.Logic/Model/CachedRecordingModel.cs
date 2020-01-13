@@ -46,12 +46,7 @@ namespace Shangqi.Logic.Model
         public Coordinate CurrentPosition { get; set; }
         public IList<Coordinate> CachedCoordinates { get; set; }
         public IList<Coordinate> ImpotedCoordinates { get; set; }
-        public bool IsMainVehicle {
-            get {
-                return this.CarName == Const.MAIN_CAR_ID;
-            }
-        }
-
+        
         public bool IsDirty { get; set; }
         public CachedRecordingModel()
         {

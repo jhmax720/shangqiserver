@@ -118,15 +118,16 @@ namespace ShangqiApi.Controllers
 
         [HttpPost("triggerpoint")]
         [Produces("application/json")]
-        public async Task AddTriggerCoordinateForRoute(int carName, string routeId, double longitude, double latitude)
+        public async Task AddTriggerCoordinateForRoute(int carName, string routeId, double longitude, double latitude, double speed)
         {
             //update the route in db
-            await _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude);
+            await _carService.UpdateRouteWithTriggerPoint(routeId, longitude, latitude, speed);
 
             //update the route in cache                        
             var carData = _carService.GetCarByName(carName);
             var cached = await RedisHelper.Instance.GetCacheItem<CachedRecordingModel>($"car_{carData.CarName}");
             cached.TriggerPoint = new Coordinate(longitude, latitude);
+            cached.Speed = speed;
             await RedisHelper.Instance.SetCache($"car_{carData.CarName}", cached);
 
         }

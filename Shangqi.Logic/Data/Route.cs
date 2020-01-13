@@ -27,6 +27,8 @@ namespace Shangqi.Logic.Data
         [BsonElement("latitude")]
         public double TriggerLatitude { get; set; }
 
+        [BsonElement("startingSpeed")]
+        public double StartingSpeed { get; set; }
         public DateTime Created { get; set; }
     }
 }
