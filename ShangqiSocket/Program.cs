@@ -424,7 +424,10 @@ namespace ShangqiSocket
                     }
                     else
                     {   //这里需要注意 当num=0时表明客户端已经断开连接，需要结束循环，不然会死循环一直卡住
+                        clients.Remove(client);
+
                         Console.WriteLine("client closed");
+                        
                         stream.Dispose();
                         break;
                     }
